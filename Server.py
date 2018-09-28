@@ -1,11 +1,22 @@
-import asyncio
+from flask import Flask
 import os
-import websockets
+from flask_sockets import Sockets
 
-async def echo(websocket, path):
-    name=await websocket.recv()
-    print("{"+name+"}")
-    await websocket.send(name.upper())
+app=Flask(__name__)
+sockets=Sockets(app)
 
-asyncio.get_event_loop().run_until_complete(websockets.serve(echo,'',os.environ.get('PORT')))
-asyncio.get_event_loop().run_forever()
+@sockets.route('/echo')
+def echo_socket(ws):
+    while not ws.closed:
+        message=ws.recieve()
+        ws.send(message)
+
+@app.route('/')
+def index():
+    return 'Index page!'
+
+if __name__ == "__main__":
+    from gevent import pyswgi
+    from geventwebsocket.handler import WebsocketHandler
+    server = pywsgi.WSGIServer(('',os.environ.get('PORT')), app, handler_class = WebSocketHandler)
+    server.serve_forever()
