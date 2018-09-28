@@ -1,22 +1,19 @@
 from flask import Flask
+from flask-socketio import SocketIO, send
 import os
-from flask_sockets import Sockets
+
 
 app=Flask(__name__)
-sockets=Sockets(app)
+app.config('SECRET_KEY'] = 'mysecret'
+socketio = SocketIO(app)
 
-@sockets.route('/echo')
-def echo_socket(ws):
-    while not ws.closed:
-        message=ws.recieve()
-        ws.send(message)
+@socketio.on('message')
+def echo_socket(msg):
+        send(msg, broadcast=True)
 
 @app.route('/')
 def index():
     return 'Index page!'
 
 if __name__ == "__main__":
-    from gevent import pywsgi
-    from geventwebsocket.handler import WebSocketHandler
-    server = pywsgi.WSGIServer(('',int(os.environ.get('PORT'))), app, handler_class = WebSocketHandler)
-    server.serve_forever()
+    socketio.run(app)
