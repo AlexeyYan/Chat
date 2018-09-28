@@ -8,4 +8,4 @@ async def echo(websocket, path):
     await websocket.send(name.upper())
 
 asyncio.get_event_loop().run_until_complete(websockets.serve(echo,'',os.environ.get('PORT')))
-asyncio.get_event_looop().run_forever()
+asyncio.get_event_loop().run_forever()
