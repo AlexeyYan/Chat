@@ -1,16 +1,10 @@
-import socket
-import os
+import asyncio
+import websockets
 
-sock=socket.socket()
-sock.bind(('', int(os.environ.get('PORT'))))
-sock.listen(1)
-conn, addr = sock.accept()
-print('connected', addr, conn)
-while True:
-    data = conn.recv(1024)
-    if not data:
-        break
-    data=data.decode("utf-8").upper()
-    conn.send(data.encode("utf-8"))
+async def echo(websocket, path):
+    name=await websocket.recv()
+    print("{"+name+"}"}
+    await websocket.send(name.upper())
 
-conn.close()
+asyncio.get_event_loop().run_until_complete(websockets.serve(echo,'',os.environ.get('PORT')))
+asyncio.get_event_looop().run_forever()
