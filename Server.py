@@ -4,7 +4,7 @@ import os
 
 
 app=Flask(__name__)
-app.config('SECRET_KEY'] = 'mysecret'
+app.config('SECRET_KEY') = 'mysecret'
 socketio = SocketIO(app)
 
 @socketio.on('message')
