@@ -1,5 +1,5 @@
 from flask import Flask
-from flas_socketio import SocketIO, send
+from flask_socketio import SocketIO, send
 import os
 
 
