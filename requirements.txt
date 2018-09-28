@@ -3,4 +3,4 @@ websockets
 sockets
 tornado
 flask
-Flask-sockets
+flask_socketio
