@@ -16,7 +16,7 @@ def index():
     return 'Index page!'
 
 if __name__ == "__main__":
-    from gevent import pyswgi
+    from gevent import pywsgi
     from geventwebsocket.handler import WebsocketHandler
     server = pywsgi.WSGIServer(('',os.environ.get('PORT')), app, handler_class = WebSocketHandler)
     server.serve_forever()
