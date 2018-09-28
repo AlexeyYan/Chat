@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_socketio import SocketIO, send
 import os
 
@@ -13,7 +13,7 @@ def echo_socket(msg):
 
 @app.route('/')
 def index():
-    return 'Index page!'
+    return render_template("main.html")
 
 if __name__ == "__main__":
     socketio.run(app)
