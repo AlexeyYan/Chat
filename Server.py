@@ -1,19 +1,42 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, send
-import os
+import tornado.httpserver
+import tornado.ioloop
+import tornado.websocket
+import tornado.web
+import time
 
+#class MainHandler(tornado.web.RequestHandler):
+ #   def get(self):
+  #      self.write(tornado.web.RequestHandler.get_argument(self,'a',40))
 
-app=Flask(__name__)
-app.config['SECRET_KEY'] = 'mysecret'
-socketio = SocketIO(app)
+class SocketHandler(tornado.websocket.WebSocketHandler):
+    clients = set()
+    def open(self):
+        #name=tornado.websocket.WebSocketHandler.get_body_argument(self,'a')
+        #self.write_message(u"Name: "+name)
+        #print(name)
+        SocketHandler.clients.add(self)
+        print("User connected!")
+        self.send("User connected!")
 
-@socketio.on('message')
-def echo_socket(msg):
-        send(msg, broadcast=True)
+    def check_origin(self, origin):
+        return True
 
-@app.route('/')
-def index():
-    return render_template("main.html")
+    def on_message(self, message):
+        print("Message: "+message)
+        self.write_message(message)
+
+    def send(self, message):
+        for client in self.clients:
+            client.write_message(message)
+
+    def on_close(self):
+        print("Connection closed")
+
+application = tornado.web.Application([
+    (r"/", SocketHandler),
+])
 
 if __name__ == "__main__":
-    socketio.run(app)
+    http_server = tornado.httpserver.HTTPServer(application)
+    http_server.listen(8080)
+    tornado.ioloop.IOLoop.instance().start()

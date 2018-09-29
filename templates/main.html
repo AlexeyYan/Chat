@@ -1,0 +1,49 @@
+<html>
+ <head>
+     <title>Chat</title>
+	  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+ </head>
+ <body>
+   <script type="text/javascript">
+   $(document).ready(function () {
+    if ("WebSocket" in window){
+	websocket = true;
+    }else{
+	// no web socket support
+	websocket = false;
+    }
+
+    var msg = { event: 'register', };
+	var ws = new WebSocket("ws://localhost:8080/");
+
+	  ws.onopen = function(){
+		  alert("Was connected!");		  
+	  };
+
+	      ws.onmessage = function(evt){
+		  var message=evt.data;
+		  console.log(evt.data);
+		  $('.messages').append('<li>'+message+'</li>');
+		  console.log('Received message');
+	  };
+
+	  $('#sendbutton').on('click', function(){
+		  console.log($('#myMessage'));
+		  ws.send($('#myMessage').val());
+          $('#myMessage').val('');
+	  
+	  });
+
+	   ws.onclose = function(){
+		   alert("Connection closed...");
+	   };
+    
+});
+	  
+</script>
+ <ul class="messages"></ul>
+ <input type="text" id="myMessage">
+ <button id="sendbutton">Send</button>
+ </body>
+</html>

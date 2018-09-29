@@ -1,3 +1,1 @@
-worker: python3 Server.py
-web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker --log-file=- server:app
-heroku ps:scale web=1
+web: python Server.py
