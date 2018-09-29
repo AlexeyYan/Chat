@@ -15,7 +15,7 @@
     }
 
     var msg = { event: 'register', };
-	var ws = new WebSocket("ws://localhost:8080/");
+	var ws = new WebSocket("ws://my-chat-socket.herokuapp.com/");
 
 	  ws.onopen = function(){
 		  alert("Was connected!");		  
