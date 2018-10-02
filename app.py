@@ -27,7 +27,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             client.write_message(message)
 
     def on_message(self, message):
-        print("Message: "+message)
+        #print("Message: "+message) DEBUG
         self.send(message)
 
 

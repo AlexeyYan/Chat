@@ -1,0 +1,16 @@
+body{
+	background-color: #c6f5ff;
+	font-family: Arial;
+}
+.messageBox{
+	background-color: white;
+	overflow-y:auto;
+	width:70%;
+	height:50%;
+	border: 1px solid;
+    margin: 0.5%;
+}
+
+#myMessage{
+	margin: 0.5%;
+}
