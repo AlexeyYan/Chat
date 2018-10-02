@@ -32,6 +32,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 
     def on_close(self):
+        SocketHandler.clients.remove(self)
         print("Connection closed")
 
 application = tornado.web.Application([
