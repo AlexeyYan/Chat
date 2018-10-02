@@ -6,7 +6,7 @@ import time
 import os
 
 settings = {
-    "static_path": os.path.join(os.path.dirname(__file__), STATIC_DIRNAME),
+    "static_path": os.path.join(os.path.dirname(__file__), 'static'),
     "static_url_prefix": "/static/",
 }
 
