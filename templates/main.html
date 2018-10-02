@@ -1,7 +1,7 @@
 <html>
  <head>
     <title>Chat</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="//templates/style.css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
  </head>
@@ -29,14 +29,26 @@
 		  console.log('Received message');
 	  };
 
-	  $('#sendbutton').on('click', function(){
+
+
+	  document.onkeyup = function(e){
+	    if(e.keyCode==13){ 
 	  	  if($('#myMessage').val() != ''){
-		  console.log($('#myMessage'));
+		  //console.log($('#myMessage'));
 		  ws.send($('#myMessage').val());
           $('#myMessage').val('');
           }
+      }
 	  
-	  });
+	  };
+
+	  $('#sendbutton').on('click', function(){
+	  	if($('#myMessage').val() != ''){
+		  //console.log($('#myMessage'));
+		  ws.send($('#myMessage').val());
+          $('#myMessage').val('');
+	  }
+	});
 
 	   ws.onclose = function(){
 		   alert("Connection closed...");
