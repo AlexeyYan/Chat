@@ -42,7 +42,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 application = tornado.web.Application([
     (r"/", SocketHandler),
-    (r"/chat", MainHandle),
+    (r"/chat", MainHandler),
 ], **settings)
 
 if __name__ == "__main__":
