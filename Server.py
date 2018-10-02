@@ -22,13 +22,14 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    def send(self, message):
+        for client in SocketHandler.clients:
+            client.write_message(message)
+
     def on_message(self, message):
         print("Message: "+message)
-        self.write_message(message)
+        self.send(message)
 
-    def send(self, message):
-        for client in self.clients:
-            client.write_message(message)
 
     def on_close(self):
         print("Connection closed")
