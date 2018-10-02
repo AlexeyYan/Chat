@@ -30,9 +30,11 @@
 	  };
 
 	  $('#sendbutton').on('click', function(){
+	  	  if($('#myMessage').val() != ''){
 		  console.log($('#myMessage'));
 		  ws.send($('#myMessage').val());
           $('#myMessage').val('');
+          }
 	  
 	  });
 
