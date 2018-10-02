@@ -5,9 +5,9 @@ import tornado.web
 import time
 import os
 
-#class MainHandler(tornado.web.RequestHandler):
- #   def get(self):
-  #      self.write(tornado.web.RequestHandler.get_argument(self,'a',40))
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        MainHandler.render(self,"templates/main.html")
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()
@@ -36,6 +36,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 application = tornado.web.Application([
     (r"/", SocketHandler),
+    (r"/chat", MainHandler),
 ])
 
 if __name__ == "__main__":
