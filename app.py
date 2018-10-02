@@ -5,6 +5,11 @@ import tornado.web
 import time
 import os
 
+settings = {
+    "static_path": os.path.join(os.path.dirname(__file__), STATIC_DIRNAME),
+    "static_url_prefix": "/static/",
+}
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         MainHandler.render(self,"templates/main.html")
@@ -37,8 +42,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
 application = tornado.web.Application([
     (r"/", SocketHandler),
-    (r"/chat", MainHandler),
-])
+    (r"/chat", MainHandle,),
+], **settings)
 
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
