@@ -15,12 +15,6 @@ body{
 	margin: 0.5%;
 }
 
-@media screen and (max-width: 425px){
-	.messageBox{
-		width: 100%;
-	}
-}
-
 @media screen and (max-width: 768px){
 	.messageBox{
 		width: 100%;
