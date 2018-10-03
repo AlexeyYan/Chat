@@ -24,7 +24,6 @@
 		  ws.send(JSON.stringify(msg));	  
 	  };
               
-              setTimeout( function(){ws.send(JSON.stringify({ event: 'register', }));}, 1000 );
 
 	      ws.onmessage = function(evt){
 		  var event=JSON.parse(evt.data);
@@ -36,6 +35,7 @@
 		  if (event.event=='connect'){
 		  	$('.messages').append('<li>'+event.user+' connected!</li>');
 		  }
+                  setTimeout( function(){ws.send(JSON.stringify({ event: 'register', }));}, 10000 );
 	  };
 
 
