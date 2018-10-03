@@ -34,8 +34,11 @@
 	  document.onkeyup = function(e){
 	    if(e.keyCode==13){ 
 	  	  if($('#myMessage').val() != ''){
+	  	  var message=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
 		  //console.log($('#myMessage'));
-		  ws.send($('#myMessage').val());
+		  if (message!=''){
+		  ws.send(message);
+		  }
           $('#myMessage').val('');
           }
       }
@@ -60,7 +63,7 @@
  <div  class="messageBox">
  <ul class="messages"></ul>
  </div>
- <input type="text" id="myMessage">
+ <input type="text" id="myMessage" maxlength="200">
  <button id="sendbutton">Send</button>
  </body>
 </html>
