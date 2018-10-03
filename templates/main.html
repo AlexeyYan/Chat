@@ -35,7 +35,6 @@
 		  if (event.event=='connect'){
 		  	$('.messages').append('<li>'+event.user+' connected!</li>');
 		  }
-                  setTimeout( function(){ws.send(JSON.stringify({ event: 'register', }));}, 1000000 );
 	  };
 
 
@@ -51,6 +50,7 @@
           $('#myMessage').val('');
           }
       }
+      setTimeout( function(){ws.send(JSON.stringify({ event: 'register', }));}, 1000000 );
 	  
 	  };
 
@@ -63,6 +63,7 @@
            $('#myMessage').val('');
        }
 	  }
+          setTimeout( function(){ws.send(JSON.stringify({ event: 'register', }));}, 1000000 );
 	});
 
 	   ws.onclose = function(){
