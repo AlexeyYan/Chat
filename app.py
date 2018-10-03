@@ -23,7 +23,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         #print(name)
         SocketHandler.clients.add(self)
         print("User connected!")
-        self.send("User connected!")
+        msg=json.dumps({'event':'connect', 'user':'User'})
+        self.send(msg)
 
     def check_origin(self, origin):
         return True
