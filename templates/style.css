@@ -1,0 +1,28 @@
+body{
+	background-color: #c6f5ff;
+	font-family: Arial;
+}
+.messageBox{
+	background-color: white;
+	overflow-y:auto;
+	width:70%;
+	height:50%;
+	border: 1px solid;
+    margin: 0.5%;
+}
+
+#myMessage{
+	margin: 0.5%;
+}
+
+@media screen and (max-width: 425px){
+	.messageBox{
+		width: 100%;
+	}
+}
+
+@media screen and (max-width: 1024px){
+	.messageBox{
+		width: 70%;
+	}
+}
