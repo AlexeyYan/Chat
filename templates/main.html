@@ -21,14 +21,19 @@
 
 	  ws.onopen = function(){
 		  alert("Was connected!");	
-		  ws_send(msg);	  
+		  ws.send(JSON.stringify(msg));	  
 	  };
 
 	      ws.onmessage = function(evt){
-		  var message=evt.data;
+		  var event=JSON.parse(evt.data);
 		  console.log(evt.data);
-		  $('.messages').append('<li>'+message+'</li>');
-		  console.log('Received message');
+		  if(event.event=='message'){
+		    $('.messages').append('<li>'+event.message+'</li>');
+		    console.log('Received message');
+		  }
+		  if (event.event=='connect'){
+		  	$('.messages').append('<li>'+event.user+'connected</li>');
+		  }
 	  };
 
 
@@ -36,9 +41,10 @@
 	  document.onkeyup = function(e){
 	    if(e.keyCode==13){ 
 	  	  if($('#myMessage').val() != ''){
-	  	  var message={event:'message',message: $('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"")};
-		  if (message!=''){
-		  ws.send(JSON.stringify(message));
+	  	  var messag=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
+		  if (messag!=''){
+		  	msg=JSON.stringify({event: 'message', message:messag,});
+		    ws.send(msg);
 		  }
           $('#myMessage').val('');
           }
@@ -48,16 +54,19 @@
 
 	  $('#sendbutton').on('click', function(){
 	  	if($('#myMessage').val() != ''){
-	  	   var message=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
-	  	   if (message!=''){
-		   ws.send(JSON.stringify(message));
+	  	   var messag=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
+	  	   if (messag!=''){
+		    msg=JSON.stringify({event: 'message', message:messag,});
+		    ws.send(msg);
            $('#myMessage').val('');
        }
 	  }
 	});
 
 	   ws.onclose = function(){
-		   alert("Connection closed...");
+		   console.log("Connection closed...");
+		   msg = JSON.stringify({ event: 'register', });
+		   setTimeout( function(){ws.send(msg);}, 1000 );
 	   };
     
 });
