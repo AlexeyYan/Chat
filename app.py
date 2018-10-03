@@ -30,10 +30,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
     def send(self, message):
         for client in SocketHandler.clients:
-            client.write_message(json.loads(message))
+            client.write_message(json.loads(message)['message'])
 
     def on_message(self, message):
-        self.send(message)
+        if json.loads(message)['event']=='message':
+           self.send(message)
 
 
     def on_close(self):
