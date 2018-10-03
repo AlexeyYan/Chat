@@ -2,6 +2,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.websocket
 import tornado.web
+import json
 import time
 import os
 
@@ -29,10 +30,9 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
 
     def send(self, message):
         for client in SocketHandler.clients:
-            client.write_message(message)
+            client.write_message(json.loads(message))
 
     def on_message(self, message):
-        #print("Message: "+message) DEBUG
         self.send(message)
 
 
