@@ -20,7 +20,8 @@
 	var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
 
 	  ws.onopen = function(){
-		  alert("Was connected!");		  
+		  alert("Was connected!");	
+		  ws_send(msg);	  
 	  };
 
 	      ws.onmessage = function(evt){

@@ -18,5 +18,6 @@ body{
 @media screen and (max-width: 768px){
 	.messageBox{
 		width: 100%;
+		height: 70%;
 	}
 }
