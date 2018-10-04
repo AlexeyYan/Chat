@@ -15,6 +15,15 @@ body{
 	margin: 0.5%;
 }
 
+.hidden{
+  position: relative;
+  background: #FFF;
+  padding: 20px;
+  width:auto;
+  max-width: 100%;
+  margin: 20px auto;
+}
+
 @media screen and (max-width: 768px){
 	.messageBox{
 		width: 100%;

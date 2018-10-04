@@ -18,9 +18,6 @@ class MainHandler(tornado.web.RequestHandler):
 class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()
     def open(self):
-        #name=tornado.websocket.WebSocketHandler.get_body_argument(self,'a')
-        #self.write_message(u"Name: "+name)
-        #print(name)
         SocketHandler.clients.add(self)
         print("User connected!")
         msg={'event':'connect', 'user':'User'}
@@ -34,11 +31,11 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             client.write_message(json.dumps(message))
 
     def on_message(self, message):
-        print(json.loads(message))
+        #print(json.loads(message))
         if json.loads(message)['event']=='message':
            msg={'event':'message', 'message':json.loads(message)['message']}
            self.send(msg)
-        elif json.loads(message)['event']=='register':
+        elif json.loads(message)['event']=='alive':
             pass
 
 
