@@ -11,6 +11,8 @@ settings = {
     "static_url_prefix": "/static/",
 }
 
+key='06102018'
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         MainHandler.render(self,"templates/main.html")
@@ -19,9 +21,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()
     def open(self):
         SocketHandler.clients.add(self)
-        print("User connected!")
-        msg={'event':'connect', 'user':'User'}
-        self.send(msg)
+        print("Client connected!")
 
     def check_origin(self, origin):
         return True
@@ -33,10 +33,18 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         #print(json.loads(message))
         if json.loads(message)['event']=='message':
-           msg={'event':'message', 'message':json.loads(message)['message']}
-           self.send(msg)
+            if json.loads(message)['key']==key:
+               msg={'event':'message', 'message':json.loads(message)['message']}
+               self.send(msg)
         elif json.loads(message)['event']=='alive':
             pass
+        elif json.loads(message)['event']=='register':
+            print(json.loads(message))
+            msg={'event':'register', 'key':key, 'errors':[]}
+            self.write_message(json.dumps(msg))
+            print("User connected!")
+            msg={'event':'connect', 'user':'User'}
+            self.send(msg)
 
 
     def on_close(self):

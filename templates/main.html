@@ -2,10 +2,9 @@
  <head>
     <title>Chat</title>
     <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
-    <link rel="stylesheet" href="{{ static_url("css/style.css") }}">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
+    <link rel="stylesheet" href="style.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
  </head>
  <body>
    <script type="text/javascript">
@@ -17,22 +16,18 @@
 	// no web socket support
 	websocket = false;
     }
-    $(window).load(function(){
-    	$.magnificPopup.open({
-    	  items:{
-            src: '<form id="login" class="hidden mfp-hide"><input type=text required placeholder="Name"><br><input type=text required placeholder="Password"><br><button id="loginbutton">Login</button></form>',
-            type: 'inline',
-          }
-        });
-    });
-    var msg = { event: 'register', };
+    var msg = {};
+    var key="";
 	var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
-	setInterval( function(){ws.send(JSON.stringify({ event: 'alive', }));}, 30000 );
-
 
 	  ws.onopen = function(){
-		  //alert("Was connected!");	
-		  ws.send(JSON.stringify(msg));	  
+	  	console.log("Was connected!")
+	  	ShowForm();
+	    $('#loginbutton').on('click', function(){
+        msg = JSON.stringify({ event: 'register', name:$('#loginName').val(), passwd:$('#loginPassword').val(), });
+   		console.log("Register")
+   		ws.send(msg);
+   	});	  
 	  };
               
 
@@ -46,6 +41,12 @@
 		  if (event.event=='connect'){
 		  	$('.messages').append('<li>'+event.user+' connected!</li>');
 		  }
+		  if(event.event=='register' && event.errors==0){
+		  	key=event.key
+		  	console.log(event.key);
+            $('.hidden').hide()
+            setInterval( function(){ws.send(JSON.stringify({ event: 'alive', key:key}));}, 30000 );
+		  }
 	  };
 
 
@@ -55,7 +56,7 @@
 	  	  if($('#myMessage').val() != ''){
 	  	  var messag=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
 		  if (messag!=''){
-		  	msg=JSON.stringify({event: 'message', message:messag,});
+		  	msg=JSON.stringify({event: 'message', message:messag, key:key, });
 		    ws.send(msg);
 		  }
           $('#myMessage').val('');
@@ -67,7 +68,7 @@
 	  	if($('#myMessage').val() != ''){
 	  	   var messag=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
 	  	   if (messag!=''){
-		    msg=JSON.stringify({event: 'message', message:messag,});
+		    msg=JSON.stringify({event: 'message', message:messag, key:key, });
 		    ws.send(msg);
            $('#myMessage').val('');
        }
@@ -80,8 +81,16 @@
 	   };
     
 });
+   function ShowForm(){
+   	$('.hidden').show()
+   }
 	  
 </script>
+<div class="hidden">
+	<input id="loginName" type="text" required placeholder="Name">
+	<input id="loginPassword" type="text" required placeholder="Password">
+	<button id="loginbutton">Login</button>
+</div>
  <div  class="messageBox">
  <ul class="messages"></ul>
  </div>
