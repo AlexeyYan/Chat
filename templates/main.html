@@ -23,8 +23,6 @@
 	  ws.onopen = function(){
 	  	console.log("Was connected!")
 	  	ShowForm();
-	    $('#loginbutton').on('click', function(){
-        msg = JSON.stringify({ event: 'register', name:$('#loginName').val(), passwd:$('#loginPassword').val(), });
    		console.log("Register")
    		ws.send(msg);
    	});	  
@@ -81,15 +79,19 @@
 	   };
     
 });
+
+   function Login(){
+	   return JSON.stringify({ event: 'register', name:$('#loginName').val(), passwd:$('#loginPassword').val(),});
+   }
    function ShowForm(){
    	$('.hidden').show()
    }
 	  
 </script>
-<form action="#" class="hidden">
+<form name="login"  action="#" class="hidden">
 	<input id="loginName" type="text" required placeholder="Name">
 	<input id="loginPassword" type="text" required placeholder="Password">
-	<button action="#"  id="loginbutton">Login</button>
+	<button action="#" onsumbit="return Login()"  id="loginbutton">Login</button>
 </form>
  <div  class="messageBox">
  <ul class="messages"></ul>
