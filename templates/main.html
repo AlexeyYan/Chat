@@ -81,7 +81,7 @@
 });
 
    function Login(){
-	   return JSON.stringify({ event: 'register', name:$('#loginName').val(), passwd:$('#loginPassword').val(),});
+	   return JSON.stringify({ event: 'register', name:document.forms["login"]["passwd"].value, passwd: document.forms["login"]["passwd"].value,});
    }
    function ShowForm(){
    	$('.hidden').show()
@@ -89,8 +89,8 @@
 	  
 </script>
 <form name="login"  action="#" class="hidden">
-	<input id="loginName" type="text" required placeholder="Name">
-	<input id="loginPassword" type="text" required placeholder="Password">
+	<input id="loginNamei" name="name" type="text" required placeholder="Name">
+	<input id="loginPassword" name="passwd" type="text" required placeholder="Password">
 	<button action="#" onsumbit="return Login()"  id="loginbutton">Login</button>
 </form>
  <div  class="messageBox">
