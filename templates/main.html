@@ -25,7 +25,7 @@
 	  	$('.hidden').show();
    		$('#loginbutton').on('click', function(){
 	  		if(document.forms["login"]["name"].value!='' && document.forms["login"]["passwd"].value!=''){
-	  		msg=JSON.stringify({ event: 'register', name:document.forms["login"]["passwd"].value, passwd: document.forms["login"]["passwd"].value,});
+	  		msg=JSON.stringify({ event: 'register', name:document.forms["login"]["name"].value, passwd: document.forms["login"]["passwd"].value,});
 	  		console.log("Register");
    		    ws.send(msg);
    		}
