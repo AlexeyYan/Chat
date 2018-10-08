@@ -12,7 +12,8 @@ settings = {
     "static_path": os.path.join(os.path.dirname(__file__), 'static'),
     "static_url_prefix": "/static/",
 }
-con=(os.environ.get['DATABASE_URL'])
+DATABASE_URL=os.environ.get['DATABASE_URL']
+con=(DATABASE_URL)
 cur=con.cursor()
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
