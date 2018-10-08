@@ -1,3 +1,4 @@
 websockets
 sockets
 tornado
+psycopg2

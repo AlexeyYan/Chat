@@ -2,6 +2,8 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.websocket
 import tornado.web
+import psycopg2
+from hashlib import md5
 import json
 import time
 import os
@@ -10,15 +12,15 @@ settings = {
     "static_path": os.path.join(os.path.dirname(__file__), 'static'),
     "static_url_prefix": "/static/",
 }
-
-key='06102018'
-
+con=(os.environ.get['DATABASE_URL'])
+cur=con.cursor()
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         MainHandler.render(self,"templates/main.html")
 
 class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()
+    key=''
     def open(self):
         SocketHandler.clients.add(self)
         print("Client connected!")
@@ -31,20 +33,26 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             client.write_message(json.dumps(message))
 
     def on_message(self, message):
-        #print(json.loads(message))
-        if json.loads(message)['event']=='message':
-            if json.loads(message)['key']==key:
-               msg={'event':'message', 'message':json.loads(message)['message']}
+        message=json.loads(message)
+        if message['event']=='message':
+            author=cur.execute("SELECT * FROM Users WHERE key={};".fomat(message['key'])).fetchone()
+            if author!=None:
+               msg={'event':'message', 'message':json.loads(message)['message'], 'author':author[1]}
                self.send(msg)
-        elif json.loads(message)['event']=='alive':
+        elif message['event']=='alive':
             pass
-        elif json.loads(message)['event']=='register':
-            print(json.loads(message))
-            msg={'event':'register', 'key':key, 'errors':[]}
-            self.write_message(json.dumps(msg))
-            print("User connected!")
-            msg={'event':'connect', 'user':'User'}
-            self.send(msg)
+        elif message['event']=='register':
+            print(message)
+            user=cur.execute("SELECT * FROM Users WHERE name={} AND passwd={};".format(message['name'], message['passwd'])).fetchone()
+            if (user!=None):
+              self.key=md5((user[2]+str(time.time()).encode)).hexdigest()
+              cur.execute("UPDATE Users SET key={} WHERE name={};".format(self.key, user[1]))
+              con.commit()
+              msg={'event':'register', 'key':key, 'errors':[]}
+              self.write_message(json.dumps(msg))
+              print("User connected!")
+              msg={'event':'connect', 'user':user[1]}
+              self.send(msg)
 
 
     def on_close(self):
