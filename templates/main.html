@@ -22,10 +22,14 @@
 
 	  ws.onopen = function(){
 	  	console.log("Was connected!")
-	  	ShowForm();
-   		console.log("Register")
-   		ws.send(msg);
-   	});	  
+	  	$('.hidden').show();
+   		$('#loginbutton').on('click', function(){
+	  		if(document.forms["login"]["name"].value!='' && document.forms["login"]["passwd"].value!=''){
+	  		msg=JSON.stringify({ event: 'register', name:document.forms["login"]["passwd"].value, passwd: document.forms["login"]["passwd"].value,});
+	  		console.log("Register");
+   		    ws.send(msg);
+   		}
+	  	});
 	  };
               
 
@@ -78,20 +82,12 @@
 		   alert("Connection closed...")
 	   };
     
-});
-
-   function Login(){
-	   return JSON.stringify({ event: 'register', name:document.forms["login"]["passwd"].value, passwd: document.forms["login"]["passwd"].value,});
-   }
-   function ShowForm(){
-   	$('.hidden').show()
-   }
-	  
+});	  
 </script>
-<form name="login"  action="#"  class="hidden" onsumbit="return Login()">
+<form name="login"  action="#"  class="hidden" onsumbit="return false;">
 	<input id="loginNamei" name="name" type="text" required placeholder="Name">
 	<input id="loginPassword" name="passwd" type="text" required placeholder="Password">
-	<button  id="loginbutton">Login</button>
+	<button  id="loginbutton" href="#">Login</button>
 </form>
  <div  class="messageBox">
  <ul class="messages"></ul>
