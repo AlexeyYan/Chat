@@ -38,7 +38,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             cur.execute("SELECT * FROM Users WHERE key='{}';".format(message['key']))
             if cur!=None: author=cur.fetchone() 
             if author!=None:
-               msg={'event':'message', 'message':json.loads(message)['message'], 'author':author[1]}
+               msg={'event':'message', 'message':message['message'], 'author':author[1]}
                self.send(msg)
         elif message['event']=='alive':
             pass
