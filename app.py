@@ -51,7 +51,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
               self.key=md5(pre_key.encode()).hexdigest()
               cur.execute("UPDATE Users SET key='{}' WHERE name='{}';".format(self.key, user[1]))
               con.commit()
-              msg={'event':'register', 'key':key, 'errors':[]}
+              msg={'event':'register', 'key':self.key, 'errors':[]}
               self.write_message(json.dumps(msg))
               print("User connected!")
               msg={'event':'connect', 'user':user[1]}
