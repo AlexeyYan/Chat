@@ -35,7 +35,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         message=json.loads(message)
         if message['event']=='message':
-            author=cur.execute("SELECT * FROM Users WHERE key='{}';".fomat(message['key'])).fetchone()
+            cur.execute("SELECT * FROM Users WHERE key='{}';".fomat(message['key']))
+            if cur!=None: author=cur.fetchone() 
             if author!=None:
                msg={'event':'message', 'message':json.loads(message)['message'], 'author':author[1]}
                self.send(msg)
