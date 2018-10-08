@@ -12,7 +12,7 @@ settings = {
     "static_path": os.path.join(os.path.dirname(__file__), 'static'),
     "static_url_prefix": "/static/",
 }
-con=(os.environ['DATABASE_URL'])
+con=psycopg2.connect(os.environ['DATABASE_URL'])
 cur=con.cursor()
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
