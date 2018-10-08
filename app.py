@@ -35,7 +35,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         message=json.loads(message)
         if message['event']=='message':
-            author=cur.execute("SELECT * FROM Users WHERE key={};".fomat(message['key'])).fetchone()
+            author=cur.execute("SELECT * FROM Users WHERE key='{}';".fomat(message['key'])).fetchone()
             if author!=None:
                msg={'event':'message', 'message':json.loads(message)['message'], 'author':author[1]}
                self.send(msg)
@@ -43,10 +43,10 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             pass
         elif message['event']=='register':
             print(message)
-            user=cur.execute("SELECT * FROM Users WHERE name={} AND passwd={};".format(message['name'], message['passwd'])).fetchone()
+            user=cur.execute("SELECT * FROM Users WHERE name='{}' AND passwd='{}';".format(message['name'], message['passwd'])).fetchone()
             if (user!=None):
               self.key=md5((user[2]+str(time.time()).encode)).hexdigest()
-              cur.execute("UPDATE Users SET key={} WHERE name={};".format(self.key, user[1]))
+              cur.execute("UPDATE Users SET key='{}' WHERE name='{}';".format(self.key, user[1]))
               con.commit()
               msg={'event':'register', 'key':key, 'errors':[]}
               self.write_message(json.dumps(msg))

@@ -1,4 +1,5 @@
 websockets
 sockets
 tornado
-psycopg2
+psycopg2-binary
+hashlib
