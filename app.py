@@ -44,7 +44,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             pass
         elif message['event']=='register':
             print(message)
-            cur.execute("SELECT * FROM Users WHERE name='{}' AND passwd='{}';".format(message['name'], md5(message['passwd'].encode()).hexdigest())
+            cur.execute("SELECT * FROM Users WHERE name='{}' AND passwd='{}';".format(message['name'], md5(message['passwd'].encode()).hexdigest()))
             if cur!=None: user=cur.fetchone() 
             if (user!=None):
               pre_key=user[2]+str(time.time())
