@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-con=create_engine(os.environ.get('DATABASE_URL))
+con=create_engine(os.environ.get('DATABASE_URL'))
 from db_models import User, Message
 
 Session=sessionmaker(con)
