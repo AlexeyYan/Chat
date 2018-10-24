@@ -37,7 +37,7 @@
 		  var event=JSON.parse(evt.data);
 		  //console.log(evt.data);
 		  if(event.event=='message'){
-		    $('.messages').append('<li>'+event.author+':  '+event.message+'</li>');
+		    $('.messages').append('<li>'+event.author+':  '+event.message+'    <i>'+event.timestamp+'</li>');
 		    console.log('Received message');
 		  }
 		  if (event.event=='connect'){
