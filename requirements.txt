@@ -2,3 +2,4 @@ websockets
 sockets
 tornado
 psycopg2-binary
+sqlalchemy
