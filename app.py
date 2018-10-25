@@ -4,6 +4,7 @@ import tornado.ioloop
 import tornado.websocket
 import tornado.web
 from db_handler import db, registerUser, newMessage
+from datetime import datetime
 import json
 import time
 import os
@@ -33,8 +34,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         message=json.loads(message)
         if message['event']=='message':
-            mssg=newMessage(message['message'], message['key'])
-            msg={'event':'message', 'message':mssg.text, 'author':mssg.author.name, 'timestamp':mssg.timestamp}
+            mssg=newMessage(message['message'],message['key'])
+            msg={'event':'message', 'message':mssg.text, 'author':mssg.author.name, 'timestamp':mssg.timestamp.isoformat()}
             self.send(msg)
         elif message['event']=='alive':
             pass
@@ -60,5 +61,6 @@ application = tornado.web.Application([
 
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(os.environ.get('PORT', 5000))
+    #http_server.listen(os.environ.get('PORT', 5000))
+    http_server.listen(5000)
     tornado.ioloop.IOLoop.instance().start()

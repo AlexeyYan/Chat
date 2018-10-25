@@ -34,7 +34,7 @@ class Message(base):
 
     id=Column(Integer, primary_key=True)
     text=Column(String(300))
-    user_id=Column(Integer, ForeignKey('user.id'))
+    user_id=Column(Integer, ForeignKey('Users.id'))
     timestamp=Column(DateTime, index=True, default=datetime.utcnow())
 
     def  __repr__(self):
