@@ -2,8 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
 
-#con=create_engine(os.environ.get["DATABASE_URL"])
-con=create_engine('postgresql://postgres:0x112524x0Yan@localhost:8080/postgres')
+con=create_engine(os.environ.get('DATABASE_URL'))
 from db_models import User, Message
 
 Session=sessionmaker(con)
