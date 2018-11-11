@@ -79,6 +79,7 @@
 			  }
 		  }
           if(event.event=='messagedump'){
+			  console.log(event.messages);
             for (var message in event.messages){
 				var author=event.messages[message].author;
 				console.log(event.messages[message].text);
