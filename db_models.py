@@ -12,6 +12,7 @@ class User(base):
 
     id=Column(Integer, primary_key=True)
     name=Column(String(40), index=True, unique=True)
+    email=Column(String(80), index=True, unique=True)
     passwd=Column(String(128))
     key=Column(String(128))
     messages=relationship('Message', backref='author', lazy='dynamic')

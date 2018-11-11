@@ -3,7 +3,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.websocket
 import tornado.web
-from db_handler import db, registerUser, newMessage
+from db_handler import db, loginUser, registerUser, newMessage, getMessages
 from datetime import datetime
 import json
 import time
@@ -35,17 +35,28 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         message=json.loads(message)
         if message['event']=='message':
             mssg=newMessage(message['message'],message['key'])
-            msg={'event':'message', 'message':mssg.text, 'author':mssg.author.name, 'timestamp':mssg.timestamp.isoformat()}
+            msg={'event':'message', 'message':mssg.text, 'author':{'id':mssg.author.id, 'name':mssg.author.name}, 'timestamp':mssg.timestamp.isoformat()}
             self.send(msg)
         elif message['event']=='alive':
             pass
-        elif message['event']=='register':
-              user=registerUser(message['name'], message['passwd'])
-              msg={'event':'register', 'key':user.key, 'errors':[]}
+        elif message['event']=='login':
+              user=loginUser(message['name'], message['passwd'])
+              msg={'event':'login', 'key':user.key, 'id':user.id, 'errors':[]}
               self.write_message(json.dumps(msg))
               print("User connected!")
+              msg=getMessages()
+              print(msg)
+              self.write_message(json.dumps({'event':'messagedump', 'messages':msg}))
               msg={'event':'connect', 'user':user.name}
               self.send(msg)
+        elif message['event']=='register':
+               print(message)
+               errors=registerUser(message['name'], message['email'], message['passwd'])
+               if errors==None: 
+                   msg={'event':'register', 'status':'OK'}
+               else: 
+                   msg={'event':'register', 'status':'0', 'error':errors}
+               self.write_message(json.dumps(msg))
 
 
     def on_close(self):

@@ -5,11 +5,11 @@
     <link rel="stylesheet" href="{{ static_url("css/style.css") }}">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/ru.js", type=module></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
  </head>
  <body>
    <script type="text/javascript">
+   moment.locale('ru')
    $(document).ready(function () {
     if ("WebSocket" in window){
 	websocket = true;
@@ -19,16 +19,27 @@
     }
     var msg = {};
     var key="";
-	var time=moment()
-	var ws = new WebSocket("wss://https://my-chat-socket.herokuapp.com/");
+	var id=0;
+	var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
 
 	  ws.onopen = function(){
-	  	console.log("Was connected!")
-	  	$('.hidden').show();
+	  	console.log("Was connected!");
+	  	document.getElementById("loginbox").className="lshow";
+		$('#register').on('click',function(){
+			document.getElementById("loginbox").className="hidden";
+			document.getElementById("registerbox").className="rshow";
+		});
+		$('#registerbutton').on('click', function(){
+			if(document.forms["registerbox"]["rname"].value!='' && document.forms["registerbox"]["name"].value!=''){
+				msg=JSON.stringify({event:'register', name:document.forms["registerbox"]["rname"].value, email:document.forms["registerbox"]["email"].value, passwd: document.forms["registerbox"]["rpasswd"].value,});
+				console.log("Register");
+				ws.send(msg);
+			}
+		});
    		$('#loginbutton').on('click', function(){
-	  		if(document.forms["login"]["name"].value!='' && document.forms["login"]["passwd"].value!=''){
-	  		msg=JSON.stringify({ event: 'register', name:document.forms["login"]["name"].value, passwd: document.forms["login"]["passwd"].value,});
-	  		console.log("Register");
+	  		if(document.forms["loginbox"]["name"].value!='' && document.forms["loginbox"]["passwd"].value!=''){
+	  		msg=JSON.stringify({ event: 'login', name:document.forms["loginbox"]["name"].value, passwd: document.forms["loginbox"]["passwd"].value,});
+	  		console.log("Login");
    		    ws.send(msg);
    		}
 	  	});
@@ -39,17 +50,47 @@
 		  var event=JSON.parse(evt.data);
 		  //console.log(evt.data);
 		  if(event.event=='message'){
-		    $('.messages').append('<li>'+event.author+':  '+event.message+'    <i>'+moment(event.timestamp).calendar()+'</li>');
+		    if (event.author.id==id){
+				$('.messages').append('<li><div><div class="myMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).calendar()+'</div></div></li>');
+				}
+				else{
+					$('.messages').append('<li><div><div class="otherMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).calendar()+'</div></div></li>');
+				}
+				$('.messages').append('<div class="clear"></div>');
 		    console.log('Received message');
 		  }
 		  if (event.event=='connect'){
-		  	$('.messages').append('<li>'+event.user+' connected!</li>');
+		  	$('.messages').append('<li style="text-align: center;">'+event.user+' connected!</li>');
 		  }
-		  if(event.event=='register' && event.errors==0){
-		  	key=event.key
+		  if(event.event=='login' && event.errors==0){
+		  	key=event.key;
+			id=event.id;
 		  	console.log(event.key);
-            $('.hidden').hide()
+            document.getElementById("loginbox").className="hidden";
+			console.log("id="+id);
             setInterval( function(){ws.send(JSON.stringify({ event: 'alive', key:key}));}, 30000 );
+		  }
+          if (event.event=='register'){
+			  if (event.status!="OK"){
+				  document.getElementById("error").innerHTML=event.error;
+			  }
+			  else{
+				  document.getElementById("registerbox").className="hidden";
+				  window.location.reload();
+			  }
+		  }
+          if(event.event=='messagedump'){
+            for (var message in event.messages){
+				var author=event.messages[message].author;
+				console.log(event.messages[message].text);
+				if (author.id==id){
+				$('.messages').append('<li><div><div class="myMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).calendar()+'</div></div></li>');
+				}
+				else{
+					$('.messages').append('<li><div><div class="otherMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).calendar()+'</div></div></li>');
+				}
+				$('.messages').append('<div class="clear"></div>');
+			}
 		  }
 	  };
 
@@ -86,15 +127,30 @@
     
 });	  
 </script>
-<form name="login" class="hidden" onsubmit="return false;">
+
+<div id="registerbox" class="hidden">
+    <form name="registerbox" class="registers" onsubmit="return false;" >
+        <input name="rname" type="text" required placeholder="Name" ><br>
+	    <p id="error" class="error"><p>
+		<input name="email" type="email" required placeholder="Email"><br>
+        <input name = "rpasswd" type="password" required placeholder="Password"><br>
+        <button id="registerbutton" href="#">Register</button>
+    </form>
+</div>
+
+<div id="loginbox" class="hidden">
+<form name="loginbox" onsubmit="return false;">
 	<input id="loginName" name="name" type="text" required placeholder="Name">
 	<input id="loginPassword" name="passwd" type="password" autocomplete="current-password" required placeholder="Password">
 	<button  id="loginbutton" href="#">Login</button>
+	<button id="register" href="#">Registration</button>
 </form>
+</div>
+
  <div  class="messageBox">
  <ul class="messages"></ul>
  </div>
- <input type="text" id="myMessage" maxlength="200">
+ <input type="text" id="myMessage"  style="width: 400px;" maxlength="300">
  <button id="sendbutton">Send</button>
  </body>
 </html>
