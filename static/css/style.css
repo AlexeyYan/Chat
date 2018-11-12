@@ -77,4 +77,9 @@ body{
 		width: 100%;
 		height: 70%;
     }
+
+    .rshow .registers{
+    	top:100px;
+    	left:120px;
+    }
 }
