@@ -3,7 +3,8 @@ from sqlalchemy.orm import sessionmaker
 import os
 from datetime import datetime
 
-con=create_engine(os.environ.get('DATABASE_URL'))
+#con=create_engine(os.environ.get('DATABASE_URL'))
+con=create_engine('postgresql://postgres:0x112524x0Yan@localhost:8080')
 from db_models import User, Message
 
 Session=sessionmaker(con)
@@ -40,6 +41,7 @@ def registerUser(name, email, passwd):
 def getMessages():
         messages=db.query(Message).all()
         msg=[]
+        if messages==None: return msg
         for message in messages:
                 msg.append({'id':message.id, 'text':message.text, 'author':{'id': message.author.id, 'name':message.author.name}, 'timestamp':message.timestamp.isoformat()})
         return msg

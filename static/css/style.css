@@ -24,15 +24,17 @@ body{
 }
 
 .rshow{
-    display: table-row-group;
-    top: 2px;
-    left: 0;
-    background: #cccccc94;
+    background: #000000c7;
     height: 100%;
     width: 100%;
     position: absolute;
-    padding: 20% 0 0 20%;
 }
+.rshow .registers{
+    top: 30%;
+    left: 40%;
+    position: absolute;
+}
+
 .lshow{
   position: relative;
   background: #FFF;

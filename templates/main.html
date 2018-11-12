@@ -19,7 +19,8 @@
     var msg = {};
     var key="";
 	var id=0;
-	var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
+	//var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
+	var ws = new WebSocket("ws:/localhost:5000/")
 
 	  ws.onopen = function(){
 	  	console.log("Was connected!");
@@ -150,7 +151,7 @@
  <div  class="messageBox">
  <ul class="messages"></ul>
  </div>
- <input type="text" id="myMessage"  style="width: 400px;" maxlength="300">
+ <input type="text" id="myMessage"  style="width: 50%;" maxlength="300">
  <button id="sendbutton">Send</button>
  </body>
 </html>

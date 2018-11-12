@@ -46,7 +46,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
               self.write_message(json.dumps(msg))
               print("User connected!")
               msg=getMessages()
-              print(msg)
               self.write_message(json.dumps({'event':'messagedump', 'messages':msg}))
               msg={'event':'connect', 'user':user.name}
               self.send(msg)
@@ -73,5 +72,6 @@ application = tornado.web.Application([
 
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(os.environ.get('PORT', 5000))
+    #http_server.listen(os.environ.get('PORT', 5000))
+    http_server.listen(5000)
     tornado.ioloop.IOLoop.instance().start()
