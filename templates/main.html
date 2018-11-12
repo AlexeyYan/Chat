@@ -19,8 +19,7 @@
     var msg = {};
     var key="";
 	var id=0;
-	//var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
-	var ws = new WebSocket("ws:/localhost:5000/")
+	var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
 
 	  ws.onopen = function(){
 	  	console.log("Was connected!");
