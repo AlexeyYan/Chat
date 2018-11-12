@@ -40,7 +40,7 @@ def registerUser(name, email, passwd):
 def getMessages():
         messages=db.query(Message).all()
         msg=[]
-        if messages==None: return msg
-        for message in messages:
-                msg.append({'id':message.id, 'text':message.text, 'author':{'id': message.author.id, 'name':message.author.name}, 'timestamp':message.timestamp.isoformat()})
+        if messages!=None:
+                for message in messages:
+                        msg.append({'id':message.id, 'text':message.text, 'author':{'id': message.author.id, 'name':message.author.name}, 'timestamp':message.timestamp.isoformat()})
         return msg
