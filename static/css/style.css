@@ -1,6 +1,7 @@
 body{
 	background-color: #c6f5ff;
 	font-family: Arial;
+    margin: 0;
 }
 .messageBox{
 	background-color: white;
