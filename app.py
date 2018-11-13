@@ -8,7 +8,7 @@ from datetime import datetime
 import json
 import time
 import os
-#
+
 
 settings = {
     "static_path": os.path.join(os.path.dirname(__file__), 'static'),
@@ -22,7 +22,6 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()
     key=''
     def open(self):
-        SocketHandler.clients.add(self)
         print("Client connected!")
 
     def check_origin(self, origin):
@@ -54,6 +53,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                errors=registerUser(message['name'], message['email'], message['passwd'])
                if errors==None: 
                    msg={'event':'register', 'status':'OK'}
+                   SocketHandler.clients.add(self)
                else: 
                    msg={'event':'register', 'status':'0', 'error':errors}
                self.write_message(json.dumps(msg))
