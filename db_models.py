@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects import postgresql
 from hashlib import md5
 import time
 from datetime import datetime
@@ -15,7 +16,10 @@ class User(base):
     email=Column(String(80), index=True, unique=True)
     passwd=Column(String(128))
     key=Column(String(128))
+    avatar=Column(String)
+
     messages=relationship('Message', backref='author', lazy='dynamic')
+    files=relationship('File', back_populates='owner', lazy='dynamic')
 
     def set_passwd(self, passwd):
         self.passwd=md5(str(passwd).encode()).hexdigest()
@@ -37,6 +41,22 @@ class Message(base):
     text=Column(String(300))
     user_id=Column(Integer, ForeignKey('Users.id'))
     timestamp=Column(DateTime, index=True, default=datetime.utcnow())
+    
+    attachments=relationship('File', back_populates='message')
+    user=relationship('User', back_populates='messages')
 
     def  __repr__(self):
        return '<Message: {}>'.format(self.text)
+
+class File(base):
+    __tablename__='Files'
+
+    id=Column(Integer, primary_key=True)
+    type=Column(Integer)
+    link=Column(String)
+    upload_time=Column(DateTime, index=True, default=datetime.utcnow())
+    owner_id=Column(Integer, ForeignKey('Users.id'))
+    message_id=Column(Integer, ForeignKey('Messages.id'))
+    
+    message=relationship('Message', back_populates='attachments')
+    owner=relationship('User', back_populates='files')
