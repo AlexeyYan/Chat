@@ -44,6 +44,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
               msg={'event':'login', 'key':user.key, 'id':user.id, 'errors':[]}
               self.write_message(json.dumps(msg))
               print("User connected!")
+              SocketHandler.clients.add(self)
               msg=getMessages()
               self.write_message(json.dumps({'event':'messagedump', 'messages':msg}))
               msg={'event':'connect', 'user':user.name}
