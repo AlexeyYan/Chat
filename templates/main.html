@@ -50,10 +50,10 @@
 		  //console.log(evt.data);
 		  if(event.event=='message'){
 		    if (event.author.id==id){
-				$('.messages').append('<li><div><div class="myMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).calendar()+'</div></div></li>');
+				$('.messages').append('<li><div><div class="myMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).utcOffset(+6.00).calendar()+'</div></div></li>');
 				}
 				else{
-					$('.messages').append('<li><div><div class="otherMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).calendar()+'</div></div></li>');
+					$('.messages').append('<li><div><div class="otherMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).utcOffset(+6.00).calendar()+'</div></div></li>');
 				}
 				$('.messages').append('<div class="clear"></div>');
 		    console.log('Received message');
@@ -84,10 +84,10 @@
 				var author=event.messages[message].author;
 				console.log(event.messages[message].text);
 				if (author.id==id){
-				$('.messages').append('<li><div><div class="myMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).calendar()+'</div></div></li>');
+				$('.messages').append('<li><div><div class="myMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).utcOffset(+6.00).calendar()+'</div></div></li>');
 				}
 				else{
-					$('.messages').append('<li><div><div class="otherMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).calendar()+'</div></div></li>');
+					$('.messages').append('<li><div><div class="otherMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).utcOffset(+6.00).calendar()+'</div></div></li>');
 				}
 				$('.messages').append('<div class="clear"></div>');
 			}
