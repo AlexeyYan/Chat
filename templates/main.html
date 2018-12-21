@@ -7,133 +7,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
  </head>
- <body>
-   <script type="text/javascript">
-   moment.locale('ru')
-   $(document).ready(function () {
-    if ("WebSocket" in window){
-	websocket = true;
-    }else{
-	websocket = false;
-    }
-    var msg = {};
-    var key="";
-	var id=0;
-	var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
-
-	  ws.onopen = function(){
-	  	console.log("Was connected!");
-	  	document.getElementById("loginbox").className="lshow";
-		$('#register').on('click',function(){
-			document.getElementById("loginbox").className="hidden";
-			document.getElementById("registerbox").className="rshow";
-		});
-		$('#registerbutton').on('click', function(){
-			if(document.forms["registerbox"]["rname"].value!='' && document.forms["registerbox"]["name"].value!=''){
-				msg=JSON.stringify({event:'register', name:document.forms["registerbox"]["rname"].value, email:document.forms["registerbox"]["email"].value, passwd: document.forms["registerbox"]["rpasswd"].value,});
-				console.log("Register");
-				ws.send(msg);
-			}
-		});
-   		$('#loginbutton').on('click', function(){
-	  		if(document.forms["loginbox"]["name"].value!='' && document.forms["loginbox"]["passwd"].value!=''){
-	  		msg=JSON.stringify({ event: 'login', name:document.forms["loginbox"]["name"].value, passwd: document.forms["loginbox"]["passwd"].value,});
-	  		console.log("Login");
-   		    ws.send(msg);
-   		}
-	  	});
-	  };
-              
-
-	      ws.onmessage = function(evt){
-		  var event=JSON.parse(evt.data);
-		  //console.log(evt.data);
-		  if(event.event=='message'){
-		    if (event.author.id==id){
-			    $('.messages').append('<li><div><div class="myMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).utcOffset(+6.00).calendar()+'</div></div></li><li></li>');
-				}
-				else{
-					$('.messages').append('<li><div><div class="otherMessage">'+event.author.name+':  '+event.message+'    <i>'+moment(event.timestamp).utcOffset(+6.00).calendar()+'</div></div></li><li></li>');
-				}
-				$('.messages').append('<div class="clear"></div>');
-		    console.log('Received message');
-		  }
-		  if (event.event=='connect'){
-		  	$('.messages').append('<li style="text-align: center;">'+event.user+' connected!</li>');
-		  }
-		  if(event.event=='login' && event.errors==0){
-		  	key=event.key;
-			id=event.id;
-		  	console.log(event.key);
-            document.getElementById("loginbox").className="hidden";
-			console.log("id="+id);
-            setInterval( function(){ws.send(JSON.stringify({ event: 'alive', key:key}));}, 30000 );
-		  }
-          if (event.event=='register'){
-			  if (event.status!="OK"){
-				  document.getElementById("error").innerHTML=event.error;
-			  }
-			  else{
-				  document.getElementById("registerbox").className="hidden";
-				  window.location.reload();
-			  }
-		  }
-          if(event.event=='messagedump'){
-			  console.log(event.messages);
-            for (var message in event.messages){
-				var author=event.messages[message].author;
-				console.log(event.messages[message].text);
-				if (author.id==id){
-					$('.messages').append('<li><div><div class="myMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).utcOffset(+6.00).calendar()+'</div></div></li><li></li>');
-				}
-				else{
-					$('.messages').append('<li><div><div class="otherMessage">'+author.name+':  '+event.messages[message].text+'    <i>'+moment(event.messages[message].timestamp).utcOffset(+6.00).calendar()+'</div></div></li><li></li>');
-				}
-				$('.messages').append('<div class="clear"></div>');
-			}
-		  }
-	  };
-
-
-
-	  document.onkeyup = function(e){
-	    if(e.keyCode==13){ 
-	  	  if($('#myMessage').val() != ''){
-	  	  var messag=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
-		  if (messag!=''){
-		  	msg=JSON.stringify({event: 'message', message:messag, key:key, });
-		    ws.send(msg);
-		  }
-          $('#myMessage').val('');
-          }
-      }	  
-	  };
-
-	  $('#sendbutton').on('click', function(){
-	  	if($('#myMessage').val() != ''){
-	  	   var messag=$('#myMessage').val().replace(/<\/?[^>]+(>|$)/g,"");
-	  	   if (messag!=''){
-		    msg=JSON.stringify({event: 'message', message:messag, key:key, });
-		    ws.send(msg);
-           $('#myMessage').val('');
-       }
-	  }
-	});
-
-	   ws.onclose = function(){
-		   console.log("Connection closed...");
-		   alert("Connection closed...")
-	   };
-    
-});	  
-</script>
+ <body style="background: url(images/background1.jpg) no-repeat fixed center;">
+   <script type="text/javascript" src="{{ static_url("js/main.js") }}"></script>
 
 <div id="registerbox" class="hidden">
     <form name="registerbox" class="registers" onsubmit="return false;" >
         <input name="rname" type="text" required placeholder="Name" ><br>
-	    <p id="error" class="error"><p>
 		<input name="email" type="email" required placeholder="Email"><br>
         <input name = "rpasswd" type="password" required placeholder="Password"><br>
+		<p id="error" class="error"></p>
         <button id="registerbutton" href="#">Register</button>
     </form>
 </div>
@@ -142,15 +24,44 @@
 <form name="loginbox" onsubmit="return false;">
 	<input id="loginName" name="name" type="text" required placeholder="Name">
 	<input id="loginPassword" name="passwd" type="password" autocomplete="current-password" required placeholder="Password">
-	<button  id="loginbutton" href="#">Login</button>
+	<button id="loginbutton" href="#">Login</button>
 	<button id="register" href="#">Registration</button>
 </form>
 </div>
 
- <div  class="messageBox">
- <ul class="messages"></ul>
- </div>
+<div id="photo_handler" class="hidden">
+<form class="upload-container" return photo_handler>
+          <img id="upload-image" src="images/upload.png">
+          <div>
+               <input id="file-input" type="file" name="file" multiple>
+               <label for="file-input">Выберите изображение</label>
+               <span>или перетащите его сюда</span>
+          </div>
+     </form>
+</div>
+<div class="messageBox">
+	<ul class="messages"></ul>
+</div>
+
+<div>
+
  <input type="text" id="myMessage"  style="width: 50%;" maxlength="300">
  <button id="sendbutton">Send</button>
- </body>
+
+ <ul class="item-menu">
+		<li class="attachment">
+			<img src="images/attachment.png">
+			<ul class="attach_list">
+				<li class="photo_attachment">
+					<img src="images/photo_attachment.png">
+				</li>
+				<li class="file_attachment">
+					<img src="images/file_attachment.png">
+				</li>
+			</ul>
+		</li>
+	</ul>
+</div>
+</body>
 </html>
+
