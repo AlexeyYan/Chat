@@ -119,31 +119,6 @@ body{
     padding-left: 10px;
 }
 
-.attachment {
-	display: inline-block;
-    position: relative;
-    z-index: 0;
- }
-
- .attachment li {
-     display: inline-block;
- }
-.attach_list {
-  width: 70px;
-  display: none;
-  position: absolute;
-  bottom: 0;
- }
-
- ul {
-    display: inline-block;
-    list-style-type: none;
-}
-
-li:hover .attach_list {
-  display: block; 
-}
-
 .photoh_show{
     background: #000000c7;
     height: 100%;
@@ -206,6 +181,11 @@ li:hover .attach_list {
     outline: -webkit-focus-ring-color auto 5px;
 }
 @media screen and (max-width: 768px){
+    #attachment_photo{
+        margin: 0 0 5px 0;
+        max-width: 300px;
+        max-height: 300px;
+    }
 	.messageBox{
 		width: 100%;
 		height: 70%;

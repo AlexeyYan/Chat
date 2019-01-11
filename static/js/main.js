@@ -152,7 +152,7 @@ $(document).ready(function () {
         }
     });
 
-    $('.photo_attachment').on('click', function () {
+    $('.item-menu').on('click', function () {
         document.getElementById("photo_handler").className = "photoh_show";
     });
 
