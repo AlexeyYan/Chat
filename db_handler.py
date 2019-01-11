@@ -31,7 +31,7 @@ filetypes = {
         'text/plain'
         'text/css',
         'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'text/html',
         'application/pdf',
         'application/vnd.ms-powerpoint'
