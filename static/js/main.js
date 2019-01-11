@@ -23,6 +23,7 @@ $(document).ready(function () {
         
         $('.close-registerbox').on('click', function(){
             document.getElementById("registerbox").className = "hidden";
+            document.getElementById("loginbox").className = "lshow";
         });
         $('#registerbutton').on('click', function () {
             if (document.forms["registerbox"]["rname"].value != '' && document.forms["registerbox"]["name"].value != '') {
