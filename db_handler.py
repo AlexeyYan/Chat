@@ -31,6 +31,7 @@ filetypes = {
         'text/plain'
         'text/css',
         'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         'text/html',
         'application/pdf',
         'application/vnd.ms-powerpoint'
@@ -128,12 +129,12 @@ def newFile(file, key):
         db.commit()
 
     elif file['content_type'] in filetypes['file']:
-        author=db.query(User).filter_by(key=key).first()
-        upload_url=requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['href']
-        upload=requests.put(upload_url, data=file.body)
+        author = db.query(User).filter_by(key=key).first()
+        upload_url = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['href']
+        upload = requests.put(upload_url, data=file.body)
         requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN})
-        url=requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['public_url']
-        fl=File(type=file['content_type'], name=file['filename'], link=url, owner=author)
+        url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['public_url']
+        f = File(type=file['content_type'], name=file['filename'], link=url, owner=author)
         db.add(fl)
         db.commit()
     return f.id
