@@ -127,6 +127,7 @@ def newFile(file, key):
         f = File(type=file['content_type'], name=name, link=url, owner=author)
         db.add(f)
         db.commit()
+        return f.id
 
     elif file['content_type'] in filetypes['file']:
         author = db.query(User).filter_by(key=key).first()
@@ -137,4 +138,4 @@ def newFile(file, key):
         f = File(type=file['content_type'], name=file['filename'], link=url, owner=author)
         db.add(f)
         db.commit()
-    return f.id
+        return f.id
