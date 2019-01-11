@@ -6,7 +6,9 @@ body{
 
 .messageBox{
 	background-color:#f3f3f366;
-	overflow-y:auto;
+    overflow-y:auto;
+    display: flex;
+    flex-direction: column;
 	width:80%;
 	height:80%;
 	border: 1px solid;
@@ -14,11 +16,8 @@ body{
 	border-radius: 3px;
 }
 
-.messages{
-    list-style-type: none;
-}
-
 #attachment_photo{
+    margin: 0 0 5px 0;
     max-width: 400px;
     max-height: 400px;
 }
@@ -80,7 +79,7 @@ body{
 
 .lshow{
   position: relative;
-  background: #FFF;
+  background:#ffffff38;
   padding: 20px;
   width:auto;
   max-width: 100%;
@@ -92,21 +91,12 @@ body{
 }
 
 .clear{
-    left: 96%;
-	max-width: 400px;
 	font-family: Helvetica;
-	position: relative;
-	padding: 0.5px 5px 0.5px 10px;
-	margin: 0 0 6px 0;
-	float: left;
-	border-radius:10px;
 }
 
 .myMessage{
     max-width: 400px;
     font-family: Helvetica;
-    position:relative;
-    left: 149%;
     padding: 0.5px 5px 0.5px 10px;
     margin: 0 0 6px 0;
     float: right;
@@ -117,8 +107,6 @@ body{
 .otherMessage{
       max-width: 400px;
       font-family: Helvetica;
-      position: relative;
-      right: 5%;
       padding: 0.5px 5px 0.5px 10px;
       margin: 0 0 6px 0;
       float: left;

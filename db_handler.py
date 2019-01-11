@@ -7,19 +7,19 @@ import os
 from datetime import datetime
 import threading
 
-
-def thread(func):
-    def wrapper(*args, **kwargs):
-        my_thread = threading.Thread(target=func, args=args, kwargs=kwargs)
-        my_thread.start()
-    return wrapper
-
-
 con = create_engine(os.environ.get('DATABASE_URL'))
+
 
 Session = sessionmaker(con)
 db = Session()
 
+'''Fucntion newMessage:
+   Args: message - information about message from client
+         attch_list - attachments for the message
+   
+   Description: Write information about message to database
+   
+   Return: dict with information about message'''
 
 def newMessage(message, attch_list):
     attach = []
@@ -36,7 +36,12 @@ def newMessage(message, attch_list):
     return {'event': 'message', 'id': msg.id, 'text': msg.text, 'attachments': attach, 'author': {
         'id': msg.author.id, 'name': msg.author.name}, 'timestamp': msg.timestamp.isoformat()}
 
-
+'''Function loginUser:
+   Args: name - name of user
+         passwd - password of user
+   Description: This function find user in database by name and if user exist
+                run password check.
+   Return: user object'''
 def loginUser(name, passwd):
     user = db.query(User).filter_by(name=name).first()
     if user != None and user.check_passwd(passwd):
@@ -80,10 +85,16 @@ def getMessages():
     return msg
 
 
-cloudinary.config(
+'''cloudinary.config(
     cloud_name=os.environ.get('CNAME'),
     api_key=os.environ.get('CKEY'),
     api_secret=os.environ.get('CSECRET')
+)'''
+
+cloudinary.config(
+    cloud_name='alexby',
+    api_key='311589761642417',
+    api_secret='iXZ0TzzPvOgG9DGKhro9NGulxQ8'
 )
 
 filetypes = {

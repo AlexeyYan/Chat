@@ -17,10 +17,15 @@ settings = {
 
 
 class MainHandler(tornado.web.RequestHandler):
-    def get(self):
+    def get(self):#Return main page
         MainHandler.render(self, "templates/main.html")
 
 
+'''Class FileHandler(tornado.web.RequestHandler):
+   methods: post
+   Description: This class is designed to receive and process ajax-request for 
+                file uploading
+''' 
 class FileHandler(tornado.web.RequestHandler):
     def post(self):
         for client in SocketHandler.clients:
@@ -32,11 +37,16 @@ class FileHandler(tornado.web.RequestHandler):
                         newFile(file, self.get_argument('key')))
         #print("Get file")
 
-
+'''class SocketHandler(tornado.websocket.WebSocketHandler):
+   methods: open, check_origin, on_message, on_close, send
+   Description: This class is the main class of the application. 
+                It processes messages coming via the WebSocket protocol.
+'''
+ 
 class SocketHandler(tornado.websocket.WebSocketHandler):
-    clients = set()
-    key = ''
-    attch_list = []
+    clients = set()#Set of connected clients
+    key = ''#Key of client
+    attch_list = []#list of attachments that client upload for message
 
     def open(self):
         print("Client connected!")
@@ -44,7 +54,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
-    def send(self, message):
+    def send(self, message):#Send message for all connected clients
         for client in SocketHandler.clients:
             client.write_message(json.dumps(message))
 
@@ -57,7 +67,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             self.send(msg)
             self.attch_list.clear()
 
-        elif message['event'] == 'alive':
+        elif message['event'] == 'alive':#Event to maintain connection
             pass
 
         elif message['event'] == 'login':
@@ -101,5 +111,4 @@ application = tornado.web.Application([
 if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(os.environ.get('PORT', 5000))
-    #http_server.listen(5000)
     tornado.ioloop.IOLoop.instance().start()

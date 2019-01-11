@@ -10,6 +10,7 @@ $(document).ready(function () {
     var id = 0;
     var attach_list = [];
     var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
+    //var ws = new WebSocket("ws://localhost:5000/");
     var dropZone = $('.upload-container');
 
     ws.onopen = function () {
@@ -41,16 +42,21 @@ $(document).ready(function () {
         //console.log(evt.data);
         if (event.event == 'message') {
             if (event.author.id == id) {
-                $('.messages').append('<li><div><div class="myMessage">' + event.author.name + ':  ' + event.text + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div></li><li></li>');
+                $('.messageBox').append('<div><div class="myMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div>');
             }
             else {
-                $('.messages').append('<li><div><div class="otherMessage">' + event.author.name + ':  ' + event.text + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div></li><li></li>');
+                $('.messageBox').append('<div><div class="otherMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div>');
             }
-            $('.messages').append('<div class="clear"></div>');
+            $(".messageBox").animate({
+                scrollTop: $(".messageBox").get(0).scrollHeight
+            }, 100);
             console.log('Received message');
         }
         if (event.event == 'connect') {
-            $('.messages').append('<li><div><div class="clear" style="text-align: center;">' + event.user + ' connected!</div></div></li>');
+            $('.messageBox').append('<div><div class="clear" style="text-align: center;">' + event.user + ' connected!</div></div>');
+            $(".messageBox").animate({
+                scrollTop: $(".messageBox").get(0).scrollHeight
+            }, 100);
         }
         if (event.event == 'login' && event.errors == 0) {
             key = event.key;
@@ -78,13 +84,15 @@ $(document).ready(function () {
                 var attachments = event.messages[message].attachments;
                 //console.log(event.messages[message].text);
                 if (author.id == id) {
-                    $('.messages').append('<li><div><div class="myMessage">' + author.name + ':  ' + event.messages[message].text + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div></li><li></li>');
+                    $('.messageBox').append('<div><div class="myMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div>');
                 }
                 else {
-                    $('.messages').append('<li><div><div class="otherMessage">' + author.name + ':  ' + event.messages[message].text + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div></li><li></li>');
+                    $('.messageBox').append('<div><div class="otherMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div>');
                 }
-                $('.messages').append('<li><div class="clear"></div></li>');
             }
+            $(".messageBox").animate({
+                scrollTop: $(".messageBox").get(0).scrollHeight
+            }, 100);
         }
 
         if(event.event == 'attach_response'){
@@ -170,12 +178,35 @@ $(document).ready(function () {
         });
     };
 
+    var filetypes={
+        'image':[
+            'image/png',
+            'image/jpeg',
+            'image/gif',
+            'image/x-icon',
+            'image/svg+xml',
+            'image/tiff',
+            'image/webp'
+        ],
+        'file':[
+            'text/css',
+            'application/msword',
+            'text/html',
+            'application/pdf',
+            'application/vnd.ms-powerpoint',
+            'application/x-rar-compressed',
+            'application/rtf',
+            'application/zip',
+            'application/x-7z-compressed'
+        ]
+    }
+
     //Обработка вложений 
     function attach(attachments) {
         if (attachments==null) return '';
         var attachm = '';
         for (var attachment in attachments) {
-            if (attachments[attachment].type == 'image/png' || attachments[attachment].type == 'image/jpeg' ) {
+            if (filetypes['image'].includes(attachments[attachment].type)) {
                 attachm += '<img id="attachment_photo" src="' + attachments[attachment].link + '"><br>';
             }
         }
