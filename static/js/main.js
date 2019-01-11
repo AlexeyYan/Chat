@@ -189,6 +189,7 @@ $(document).ready(function () {
             'image/webp'
         ],
         'file':[
+            'text/plain',
             'text/css',
             'application/msword',
             'text/html',
@@ -209,6 +210,10 @@ $(document).ready(function () {
             if (filetypes['image'].includes(attachments[attachment].type)) {
                 attachm += '<img id="attachment_photo" src="' + attachments[attachment].link + '"><br>';
             }
+            if (filetypes['file'].includes(attachments[attachment].type)) {
+                attachm += '<a href="' + attachments[attachment].link + '">' + attachments[attachment].name + '<img src="images/file_attachment.png"></a><br>';
+            }
+            
         }
         console.log('att' + attachm);
         return attachm;

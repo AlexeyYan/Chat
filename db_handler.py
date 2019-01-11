@@ -2,12 +2,45 @@ from db_models import User, Message, File
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import cloudinary
+import requests
 from cloudinary import uploader, api
 import os
 from datetime import datetime
 import threading
 
 con = create_engine(os.environ.get('DATABASE_URL'))
+cloudinary.config(
+    cloud_name=os.environ.get('CNAME'),
+    api_key=os.environ.get('CKEY'),
+    api_secret=os.environ.get('CSECRET')
+)
+
+Y_TOKEN=os.environ.get('YTOKEN')
+
+filetypes = {
+    'image': [
+        'image/png',
+        'image/jpeg',
+        'image/gif',
+        'image/x-icon',
+        'image/svg+xml',
+        'image/tiff',
+        'image/webp'
+    ],
+    'file': [
+        'text/plain'
+        'text/css',
+        'application/msword',
+        'text/html',
+        'application/pdf',
+        'application/vnd.ms-powerpoint'
+        'application/x-rar-compressed',
+        'application/rtf',
+        'application/zip',
+        'application/x-7z-compressed'
+    ]
+}
+
 
 
 Session = sessionmaker(con)
@@ -75,7 +108,7 @@ def getMessages():
                 attach_ids = message.attachments
                 for ids in attach_ids:
                     attachment = db.query(File).filter_by(id=ids).first()
-                    attach.append({'id': attachment.id, 'type': attachment.type,
+                    attach.append({'id': attachment.id, 'name':attachment.name, 'type': attachment.type,
                                    'link': attachment.link, 'owner_id': attachment.owner_id})
 
             # print(attach)
@@ -85,42 +118,6 @@ def getMessages():
     return msg
 
 
-'''cloudinary.config(
-    cloud_name=os.environ.get('CNAME'),
-    api_key=os.environ.get('CKEY'),
-    api_secret=os.environ.get('CSECRET')
-)'''
-
-cloudinary.config(
-    cloud_name='alexby',
-    api_key='311589761642417',
-    api_secret='iXZ0TzzPvOgG9DGKhro9NGulxQ8'
-)
-
-filetypes = {
-    'image': [
-        'image/png',
-        'image/jpeg',
-        'image/gif',
-        'image/x-icon',
-        'image/svg+xml',
-        'image/tiff',
-        'image/webp'
-    ],
-    'file': [
-        'text/css',
-        'application/msword',
-        'text/html',
-        'application/pdf',
-        'application/vnd.ms-powerpoint'
-        'application/x-rar-compressed',
-        'application/rtf',
-        'application/zip',
-        'application/x-7z-compressed'
-    ]
-}
-
-
 def newFile(file, key):
     if file['content_type'] in filetypes['image']:
         name = file['filename']
@@ -128,5 +125,15 @@ def newFile(file, key):
         url = cloudinary.uploader.upload(file.body)['url']
         f = File(type=file['content_type'], name=name, link=url, owner=author)
         db.add(f)
+        db.commit()
+
+    elif file['content_type'] in filetypes['file']:
+        author=db.query(User).filter_by(key=key).first()
+        upload_url=requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['href']
+        upload=requests.put(upload_url, data=file.body)
+        requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN})
+        url=requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['public_url']
+        fl=File(type=file['content_type'], name=file['filename'], link=url, owner=author)
+        db.add(fl)
         db.commit()
     return f.id
