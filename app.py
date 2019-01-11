@@ -84,7 +84,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             msg = {'event': 'connect', 'user': user.name}
             self.send(msg)
 
-        '''elif message['event'] == 'register':
+        elif message['event'] == 'register':
             print(message)
             errors = registerUser(
                 message['name'], message['email'], message['passwd'])
@@ -93,7 +93,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
                 SocketHandler.clients.add(self)
             else:
                 msg = {'event': 'register', 'status': '0', 'error': errors}
-            self.write_message(json.dumps(msg))'''
+            self.write_message(json.dumps(msg))
 
     def on_close(self):
         SocketHandler.clients.remove(self)
