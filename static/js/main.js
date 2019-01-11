@@ -20,6 +20,10 @@ $(document).ready(function () {
             document.getElementById("loginbox").className = "hidden";
             document.getElementById("registerbox").className = "rshow";
         });
+        
+        $('.close-registerbox').on('click', function(){
+            document.getElementById("registerbox").className = "hidden";
+        });
         $('#registerbutton').on('click', function () {
             if (document.forms["registerbox"]["rname"].value != '' && document.forms["registerbox"]["name"].value != '') {
                 msg = JSON.stringify({ event: 'register', name: document.forms["registerbox"]["rname"].value, email: document.forms["registerbox"]["email"].value, passwd: document.forms["registerbox"]["rpasswd"].value, });
@@ -154,6 +158,9 @@ $(document).ready(function () {
 
     $('.item-menu').on('click', function () {
         document.getElementById("photo_handler").className = "photoh_show";
+    });
+    $('.close-upload-container').on('click', function(){
+        document.getElementById("photo_handler").className = "hidden";
     });
 
     ws.onclose = function () {

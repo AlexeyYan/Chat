@@ -37,6 +37,20 @@ body{
     display: none;
 }
 
+.close-upload-container{
+    width:25px;
+    height:25px;
+    position: absolute;
+    left: 97%;
+}
+
+.close-registerbox{
+    width:25px;
+    height:25px;
+    position: absolute;
+    left: 97%;
+}
+
 .rshow{
     background: #000000c7;
     height: 100%;

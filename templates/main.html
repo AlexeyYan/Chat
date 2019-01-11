@@ -12,6 +12,7 @@
    <script type="text/javascript" src="{{ static_url("js/main.js") }}"></script>
 
 <div id="registerbox" class="hidden">
+	<img class="close-registerbox" src="images/cancel.png">
     <form name="registerbox" class="registers" onsubmit="return false;" >
         <input name="rname" type="text" required placeholder="Name" ><br>
 		<input name="email" type="email" required placeholder="Email"><br>
@@ -31,6 +32,7 @@
 </div>
 
 <div id="photo_handler" class="hidden">
+<img class="close-upload-container" src="images/cancel.png">
 <form class="upload-container" return photo_handler>
           <img id="upload-image" src="images/upload.png">
           <div>
