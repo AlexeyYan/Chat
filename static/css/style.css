@@ -212,4 +212,15 @@ body{
     	top:100px;
     	left:120px;
     }
+    .photoh_show .upload-container{
+        left:28%;
+        width: 200px;
+        height: 200px;
+    }
+    .close-upload-container{
+        left: 91%;
+    }
+    .close-registerbox{
+        left: 91%;
+    }
 }
