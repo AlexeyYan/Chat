@@ -135,6 +135,6 @@ def newFile(file, key):
         requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN})
         url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['public_url']
         f = File(type=file['content_type'], name=file['filename'], link=url, owner=author)
-        db.add(fl)
+        db.add(f)
         db.commit()
     return f.id
