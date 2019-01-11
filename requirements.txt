@@ -1,6 +1,7 @@
 websockets
 sockets
 tornado
+requests
 psycopg2-binary
 sqlalchemy
 cloudinary
