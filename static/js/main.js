@@ -197,6 +197,7 @@ $(document).ready(function () {
             'application/pdf',
             'application/vnd.ms-powerpoint',
             'application/x-rar-compressed',
+            'application/x-zip-compressed',
             'application/rtf',
             'application/zip',
             'application/x-7z-compressed'

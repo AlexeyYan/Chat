@@ -35,7 +35,7 @@ class FileHandler(tornado.web.RequestHandler):
                 for file in self.request.files['files[]']:
                     owner.attch_list.append(
                         newFile(file, self.get_argument('key')))
-        #print("Get file")
+        print("Get file")
 
 '''class SocketHandler(tornado.websocket.WebSocketHandler):
    methods: open, check_origin, on_message, on_close, send
