@@ -193,6 +193,7 @@ $(document).ready(function () {
             'text/css',
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'text/html',
             'application/pdf',
             'application/vnd.ms-powerpoint',
