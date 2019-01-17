@@ -16,8 +16,9 @@ body{
 	border-radius: 3px;
 }
 
-#attachment_photo{
+.attachment_photo{
     margin: 0 0 5px 0;
+    cursor: pointer;
     max-width: 400px;
     max-height: 400px;
 }
@@ -26,6 +27,10 @@ body{
 	margin: 0.5%;
     display: inline-block;
     vertical-align: top;
+}
+
+a{
+    text-decoration: none;
 }
 
 #sendbutton{
@@ -43,8 +48,13 @@ body{
     position: absolute;
     left: 97%;
 }
-
 .close-registerbox{
+    width:25px;
+    height:25px;
+    position: absolute;
+    left: 97%;
+}
+.close-big_picture{
     width:25px;
     height:25px;
     position: absolute;
@@ -98,6 +108,23 @@ body{
   width:auto;
   max-width: 100%;
   margin: 20px auto;
+}
+
+.big_picture-show{
+    background: #000000c7;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+    margin: 0;
+}
+#big_picture-img{
+    max-width: 70%;
+    max-height: 90%;
+    display: block;
+    margin: 2% auto auto auto;
+    border: 2px solid white;
+    border-radius: 5px;
 }
 
 .error{
@@ -222,5 +249,8 @@ body{
     }
     .close-registerbox{
         left: 91%;
+    }
+    .close-big_picture{
+        left: 93%;
     }
 }

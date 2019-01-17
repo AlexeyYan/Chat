@@ -28,14 +28,16 @@ class MainHandler(tornado.web.RequestHandler):
 ''' 
 class FileHandler(tornado.web.RequestHandler):
     def post(self):
+        attch_list=[]
         for client in SocketHandler.clients:
             if client.key == self.get_argument('key'):
-                print("Find")
+                print("Find file owner!")
                 owner = client
-                for file in self.request.files['files[]']:
-                    owner.attch_list.append(
-                        newFile(file, self.get_argument('key')))
-        print("Get file")
+        if (owner):
+            for file in self.request.files['files[]']:
+                attch_list.append(newFile(file, self.get_argument('key')))
+            owner.write_message(json.dumps({'event':'attach_response', 'files':attch_list}))
+            print("Files uploaded!")
 
 '''class SocketHandler(tornado.websocket.WebSocketHandler):
    methods: open, check_origin, on_message, on_close, send
@@ -46,10 +48,9 @@ class FileHandler(tornado.web.RequestHandler):
 class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()#Set of connected clients
     key = ''#Key of client
-    attch_list = []#list of attachments that client upload for message
-
     def open(self):
         print("Client connected!")
+        
 
     def check_origin(self, origin):
         return True
@@ -63,9 +64,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         if message['event'] == 'message':
             if self not in SocketHandler.clients:
                 return
-            msg = newMessage(message, self.attch_list)
+            msg = newMessage(message)
             self.send(msg)
-            self.attch_list.clear()
 
         elif message['event'] == 'alive':#Event to maintain connection
             pass

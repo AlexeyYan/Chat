@@ -6,7 +6,6 @@ import requests
 from cloudinary import uploader, api
 import os
 from datetime import datetime
-import threading
 
 con = create_engine(os.environ.get('DATABASE_URL'))
 cloudinary.config(
@@ -14,7 +13,6 @@ cloudinary.config(
     api_key=os.environ.get('CKEY'),
     api_secret=os.environ.get('CSECRET')
 )
-
 Y_TOKEN=os.environ.get('YTOKEN')
 
 filetypes = {
@@ -57,12 +55,11 @@ db = Session()
    
    Return: dict with information about message'''
 
-def newMessage(message, attch_list):
+def newMessage(message):
     attach = []
     author = db.query(User).filter_by(key=message['key']).first()
-    msg = Message(text=message['message'], author=author)
-    msg.attachments = attch_list
-    for ids in attch_list:
+    msg = Message(text=message['message'], author=author, attachments=message['attachments'])
+    for ids in message['attachments']:
         attachment = db.query(File).filter_by(id=ids).first()
         attach.append({'id': attachment.id, 'type': attachment.type, 'name': attachment.name,
                        'link': attachment.link, 'owner_id': attachment.owner_id})
@@ -122,6 +119,7 @@ def getMessages():
 
 
 def newFile(file, key):
+    print('newfile')
     if file['content_type'] in filetypes['image']:
         name = file['filename']
         author = db.query(User).filter_by(key=key).first()
@@ -129,15 +127,20 @@ def newFile(file, key):
         f = File(type=file['content_type'], name=name, link=url, owner=author)
         db.add(f)
         db.commit()
-        return f.id
+        
 
     elif file['content_type'] in filetypes['file']:
+        print('NO IMAGE')
         author = db.query(User).filter_by(key=key).first()
-        upload_url = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['href']
-        upload = requests.put(upload_url, data=file.body)
-        requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN})
-        url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()['public_url']
-        f = File(type=file['content_type'], name=file['filename'], link=url, owner=author)
+        upload_url = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()
+        if 'href' in upload_url.keys():
+            requests.put(upload_url['href'], data=file.body)
+            requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN})
+        url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()
+        print('FILE URL:'+str(url))
+        f = File(type=file['content_type'], name=file['filename'], link=url['public_url'], owner=author)
         db.add(f)
         db.commit()
-        return f.id
+    
+    else: return None
+    return f.id

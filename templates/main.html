@@ -5,11 +5,11 @@
     <link rel="stylesheet" href="{{ static_url("css/style.css") }}">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
-	<base target="_blank">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="{{ static_url("js/main.js") }}"></script>
+    <base target="_blank">
  </head>
  <body style="background: url(images/background1.jpg) no-repeat fixed center;">
-   <script type="text/javascript" src="{{ static_url("js/main.js") }}"></script>
 
 <div id="registerbox" class="hidden">
 	<img class="close-registerbox" src="images/cancel.png">
@@ -34,13 +34,18 @@
 <div id="photo_handler" class="hidden">
 <img class="close-upload-container" src="images/cancel.png">
 <form class="upload-container" return photo_handler>
-          <img id="upload-image" src="images/upload.png">
+          <img id="upload-image" src="images/outbox.png">
           <div>
                <input id="file-input" type="file" name="file" multiple>
-               <label for="file-input">Выберите изображение</label>
+               <label id='file-input-text' for="file-input">Выберите изображение</label>
                <span>или перетащите его сюда</span>
           </div>
      </form>
+</div>
+
+<div id="big_picture" class="hidden">
+    <img class="close-big_picture" src="images/cancel.png">
+    <img id="big_picture-img" src="images/ok-upload_128.png">
 </div>
 
 <div class="messageBox"></div>

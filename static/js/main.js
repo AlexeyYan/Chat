@@ -41,10 +41,8 @@ $(document).ready(function () {
         });
     };
 
-
     ws.onmessage = function (evt) {
         var event = JSON.parse(evt.data);
-        //console.log(evt.data);
         if (event.event == 'message') {
             if (event.author.id == id) {
                 $('.messageBox').append('<div><div class="myMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div>');
@@ -66,9 +64,7 @@ $(document).ready(function () {
         if (event.event == 'login' && event.errors == 0) {
             key = event.key;
             id = event.id;
-            //console.log(event.key);
             document.getElementById("loginbox").className = "hidden";
-            //console.log("id=" + id);
             setInterval(function () { ws.send(JSON.stringify({ event: 'alive', key: key })); }, 30000);
         }
 
@@ -87,7 +83,6 @@ $(document).ready(function () {
             for (var message in event.messages) {
                 var author = event.messages[message].author;
                 var attachments = event.messages[message].attachments;
-                //console.log(event.messages[message].text);
                 if (author.id == id) {
                     $('.messageBox').append('<div><div class="myMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div>');
                 }
@@ -101,8 +96,11 @@ $(document).ready(function () {
         }
 
         if(event.event == 'attach_response'){
+            console.log('File response')
             console.log(event.files);
             attach_list=event.files;
+            document.getElementById("photo_handler").className = "hidden";
+            document.getElementById('upload-image').src='images/upload.png';
         }
     };
     //Прикрепление вложения
@@ -121,9 +119,8 @@ $(document).ready(function () {
     dropZone.on('drop', function (e) {
         dropZone.removeClass('dragover');
         let files = e.originalEvent.dataTransfer.files;
-        sendFiles(files);
-        document.getElementById("photo_handler").className = "hidden";
-        
+        document.getElementById('upload-image').src='images/loading.svg'
+        sendFiles(files);        
     });
 
     $('#file-input').change(function () {
@@ -133,7 +130,7 @@ $(document).ready(function () {
     //Отправка сообщения
     document.onkeyup = function (e) {
         if (e.keyCode == 13) {
-            if ($('#myMessage').val() != '') {
+            if ($('#myMessage').val() != '' || attach_list.length!=0) {
                 var messag = $('#myMessage').val().replace(/<\/?[^>]+(>|$)/g, "");
                 if (messag != '') {
                     msg = JSON.stringify({ event: 'message', message: messag, key: key, attachments: attach_list, });
@@ -148,13 +145,24 @@ $(document).ready(function () {
     $('#sendbutton').on('click', function () {
         if ($('#myMessage').val() != '') {
             var messag = $('#myMessage').val().replace(/<\/?[^>]+(>|$)/g, "");
-            if (messag != '') {
+            if (messag != '' || attach_list.length!=0) {
                 msg = JSON.stringify({ event: 'message', message: messag, key: key, attachments: attach_list, });
                 ws.send(msg);
                 $('#myMessage').val('');
                 attach_list = [];
             }
         }
+    });
+
+    $(document.body).on('click','.attachment_photo', function(e) {
+        document.getElementById('big_picture').className ="big_picture-show";
+        console.log(document.getElementById('big_picture-img'));
+        document.getElementById('big_picture-img').src = e.currentTarget.attributes.src.value;
+
+    });
+
+    $('.close-big_picture').on('click', function(){
+        document.getElementById('big_picture').className ="hidden";
     });
 
     $('.item-menu').on('click', function () {
@@ -219,7 +227,7 @@ $(document).ready(function () {
         var attachm = '';
         for (var attachment in attachments) {
             if (filetypes['image'].includes(attachments[attachment].type)) {
-                attachm += '<img id="attachment_photo" src="' + attachments[attachment].link + '"><br>';
+                attachm += '<img class="attachment_photo" src="' + attachments[attachment].link + '"><br>';
             }
             if (filetypes['file'].includes(attachments[attachment].type)) {
                 attachm += '<a href="' + attachments[attachment].link + '">' + attachments[attachment].name + '<img src="images/file_attachment.png"></a><br>';
@@ -229,7 +237,4 @@ $(document).ready(function () {
         console.log('att' + attachm);
         return attachm;
     }
-
-
-
 });	  
