@@ -1,13 +1,12 @@
+import os
+import json
+from datetime import datetime
 from hashlib import md5
 import tornado.httpserver
 import tornado.ioloop
 import tornado.websocket
 import tornado.web
 from db_handler import db, loginUser, registerUser, newMessage, getMessages, newFile
-from datetime import datetime
-import json
-import time
-import os
 
 
 settings = {
@@ -21,33 +20,32 @@ class MainHandler(tornado.web.RequestHandler):
         MainHandler.render(self, "templates/main.html")
 
 
-'''Class FileHandler(tornado.web.RequestHandler):
+class FileHandler(tornado.web.RequestHandler):
+    '''
    methods: post
    Description: This class is designed to receive and process ajax-request for 
                 file uploading
-''' 
-class FileHandler(tornado.web.RequestHandler):
+'''
     def post(self):
         attch_list=[]
         for client in SocketHandler.clients:
             if client.key == self.get_argument('key'):
-                print("Find file owner!")
                 owner = client
         if (owner):
             for file in self.request.files['files[]']:
                 attch_list.append(newFile(file, self.get_argument('key')))
             owner.write_message(json.dumps({'event':'attach_response', 'files':attch_list}))
-            print("Files uploaded!")
 
-'''class SocketHandler(tornado.websocket.WebSocketHandler):
+ 
+class SocketHandler(tornado.websocket.WebSocketHandler):
+    '''
    methods: open, check_origin, on_message, on_close, send
    Description: This class is the main class of the application. 
                 It processes messages coming via the WebSocket protocol.
 '''
- 
-class SocketHandler(tornado.websocket.WebSocketHandler):
     clients = set()#Set of connected clients
     key = ''#Key of client
+    user=None
     def open(self):
         print("Client connected!")
         
@@ -71,28 +69,36 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             pass
 
         elif message['event'] == 'login':
-            user = loginUser(message['name'], message['passwd'])
-            msg = {'event': 'login', 'key': user.key,
-                   'id': user.id, 'errors': []}
-            self.write_message(json.dumps(msg))
-            print("User connected!")
-            SocketHandler.clients.add(self)
-            self.key = user.key
-            messg = getMessages()
-            self.write_message(json.dumps(
-                {'event': 'messagedump', 'messages': messg}))
-            msg = {'event': 'connect', 'user': user.name}
-            self.send(msg)
+            self.user = loginUser(message['name'], message['passwd'])
+            print(self.user)
+            if self.user:
+                msg = {'event': 'login', 'status':'true', 'key': self.user.key,
+                       'id': self.user.id}
+                self.write_message(json.dumps(msg))
+                print("User connected!")
+                SocketHandler.clients.add(self)
+                self.key = self.user.key
+                messg = getMessages()
+                self.write_message(json.dumps(
+                    {'event': 'messagedump', 'messages': messg}))
+                msg = {'event': 'connect', 'user': self.user.name}
+                self.send(msg)
+                self.dis={'event': 'disconnect', 'user': self.user.name}
+            else:
+                msg={'event': 'login', 'status':'false'}
+                self.write_message(json.dumps(msg))
+                print('false')
+
 
         elif message['event'] == 'register':
             print(message)
             errors = registerUser(
                 message['name'], message['email'], message['passwd'])
-            if errors == None:
-                msg = {'event': 'register', 'status': 'OK'}
+            if not errors:
+                msg = {'event': 'register', 'status': 'true'}
                 SocketHandler.clients.add(self)
             else:
-                msg = {'event': 'register', 'status': '0', 'error': errors}
+                msg = {'event': 'register', 'status': 'false', 'error': errors}
             self.write_message(json.dumps(msg))
 
     def on_close(self):

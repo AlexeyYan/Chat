@@ -1,17 +1,39 @@
 moment.locale('ru')
+var cookie_agree = getCookie('cookie_agree');
 $(document).ready(function () {
-    if ("WebSocket" in window) {
-        websocket = true;
-    } else {
-        websocket = false;
-    }
     var msg = {};
     var key = "";
     var id = 0;
     var attach_list = [];
     var ws = new WebSocket("wss://my-chat-socket.herokuapp.com/");
-    //var ws = new WebSocket("ws://localhost:5000/");
     var dropZone = $('.upload-container');
+    var alive = null
+    
+    if ("WebSocket" in window) {
+        websocket = true;
+    } else {
+        websocket = false;
+    }
+
+    if (cookie_agree == undefined) {
+        document.getElementById('cookie-agreement').className = 'cookie-agree';
+    }
+    else {
+        var back = getCookie('background');
+        if (back != undefined) {
+            document.body.style.backgroundImage = back;
+        }
+        else {
+            document.cookie = 'background=' + document.body.style.backgroundImage + ';path=/;max-age=31536e3;';
+        }
+
+    }
+
+    $('#cookie-sumbit').on('click', function () {
+        document.cookie = "cookie_agree=1;path=/;max-age=31536e3;";
+        document.cookie = 'background=' + document.body.style.backgroundImage + ';path=/;max-age=31536e3;';
+        document.getElementById('cookie-agreement').className = 'hidden';
+    });
 
     ws.onopen = function () {
         console.log("Was connected!");
@@ -45,10 +67,10 @@ $(document).ready(function () {
         var event = JSON.parse(evt.data);
         if (event.event == 'message') {
             if (event.author.id == id) {
-                $('.messageBox').append('<div><div class="myMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div>');
+                $('.messageBox').append('<div><div class="myMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<p>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</p></div></div>');
             }
             else {
-                $('.messageBox').append('<div><div class="otherMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<i>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</div></div>');
+                $('.messageBox').append('<div><div class="otherMessage"><b>' + event.author.name + ':</b>  ' + event.text + '<br>' + attach(event.attachments) + '<p>' + moment(event.timestamp).utcOffset(+6.00).calendar() + '</p></div></div>');
             }
             $(".messageBox").animate({
                 scrollTop: $(".messageBox").get(0).scrollHeight
@@ -61,16 +83,28 @@ $(document).ready(function () {
                 scrollTop: $(".messageBox").get(0).scrollHeight
             }, 100);
         }
-        if (event.event == 'login' && event.errors == 0) {
-            key = event.key;
-            id = event.id;
-            document.getElementById("loginbox").className = "hidden";
-            setInterval(function () { ws.send(JSON.stringify({ event: 'alive', key: key })); }, 30000);
+        if(event.event == 'disconnect'){
+            console.log(event);
+            $('.messageBox').append('<div><div class="clear" style="text-align: center;">' + event.user + ' disconnected!</div></div>');
+            $(".messageBox").animate({
+                scrollTop: $(".messageBox").get(0).scrollHeight
+            }, 100);
+        }
+        if (event.event == 'login'){
+            if (event.status == 'true'){
+                key = event.key;
+                id = event.id;
+                document.getElementById("loginbox").className = "hidden";
+                alive=setInterval(function () { ws.send(JSON.stringify({ event: 'alive', key: key })); }, 30000);
+            }
+            if(event.status =='false'){
+                document.getElementById("log_error").innerHTML="Ошибка авторизации! Проверьте данные для входа.";
+            }
         }
 
         if (event.event == 'register') {
-            if (event.status != "OK") {
-                document.getElementById("error").innerHTML = event.error;
+            if (event.status != "true") {
+                document.getElementById("reg_error").innerHTML = event.error;
             }
             else {
                 document.getElementById("registerbox").className = "hidden";
@@ -79,15 +113,14 @@ $(document).ready(function () {
         }
 
         if (event.event == 'messagedump') {
-            console.log(event.messages);
             for (var message in event.messages) {
                 var author = event.messages[message].author;
                 var attachments = event.messages[message].attachments;
                 if (author.id == id) {
-                    $('.messageBox').append('<div><div class="myMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div>');
+                    $('.messageBox').append('<div><div class="myMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<p>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</p></div></div>');
                 }
                 else {
-                    $('.messageBox').append('<div><div class="otherMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<i>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</div></div>');
+                    $('.messageBox').append('<div><div class="otherMessage"><b>' + author.name + ':</b>  ' + event.messages[message].text + '<br>' + attach(attachments) + '<p>' + moment(event.messages[message].timestamp).utcOffset(+6.00).calendar() + '</p></div></div>');
                 }
             }
             $(".messageBox").animate({
@@ -96,13 +129,16 @@ $(document).ready(function () {
         }
 
         if(event.event == 'attach_response'){
-            console.log('File response')
-            console.log(event.files);
             attach_list=event.files;
             document.getElementById("photo_handler").className = "hidden";
             document.getElementById('upload-image').src='images/upload.png';
         }
     };
+
+    ws.onclose=function(){
+        console.log('Connection closed');
+        clearInterval(alive);
+    }
     //Прикрепление вложения
     dropZone.on('drag dragstart dragend dragover dragenter dragleave drop', function () {
         return false;
@@ -127,28 +163,34 @@ $(document).ready(function () {
         let files = this.files;
         sendFiles(files);
     });
+
+    $('#myMessage').on('keydown', function(event) {
+        if($(this).text().length === 300 && event.keyCode != 8) {
+            event.preventDefault();
+        }
+    });
     //Отправка сообщения
     document.onkeyup = function (e) {
-        if (e.keyCode == 13) {
-            if ($('#myMessage').val() != '' || attach_list.length!=0) {
-                var messag = $('#myMessage').val().replace(/<\/?[^>]+(>|$)/g, "");
+        if (e.keyCode == 13 && !e.shiftKey) {
+            if ($('#myMessage').text() != '' || attach_list.length!=0) {
+                var messag = $('#myMessage').text().replace(/<\/?[^>]+(>|$)/g, "");
                 if (messag != '') {
                     msg = JSON.stringify({ event: 'message', message: messag, key: key, attachments: attach_list, });
                     ws.send(msg);
                 }
-                $('#myMessage').val('');
+                $('#myMessage').text('');
                 attach_list = [];
             }
         }
     };
 
     $('#sendbutton').on('click', function () {
-        if ($('#myMessage').val() != '') {
-            var messag = $('#myMessage').val().replace(/<\/?[^>]+(>|$)/g, "");
+        if ($('#myMessage').text() != '') {
+            var messag = $('#myMessage').text.replace(/<\/?[^>]+(>|$)/g, "");
             if (messag != '' || attach_list.length!=0) {
                 msg = JSON.stringify({ event: 'message', message: messag, key: key, attachments: attach_list, });
                 ws.send(msg);
-                $('#myMessage').val('');
+                $('#myMessage').text('');
                 attach_list = [];
             }
         }
@@ -156,7 +198,6 @@ $(document).ready(function () {
 
     $(document.body).on('click','.attachment_photo', function(e) {
         document.getElementById('big_picture').className ="big_picture-show";
-        console.log(document.getElementById('big_picture-img'));
         document.getElementById('big_picture-img').src = e.currentTarget.attributes.src.value;
 
     });
@@ -234,7 +275,13 @@ $(document).ready(function () {
             }
             
         }
-        console.log('att' + attachm);
         return attachm;
     }
 });	  
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}

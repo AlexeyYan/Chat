@@ -1,11 +1,12 @@
-from db_models import User, Message, File
+import os
+from datetime import datetime
+import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import cloudinary
-import requests
 from cloudinary import uploader, api
-import os
-from datetime import datetime
+from db_models import User, Message, File
+
 
 con = create_engine(os.environ.get('DATABASE_URL'))
 cloudinary.config(
@@ -43,7 +44,6 @@ filetypes = {
 }
 
 
-
 Session = sessionmaker(con)
 db = Session()
 
@@ -54,11 +54,11 @@ db = Session()
    Description: Write information about message to database
    
    Return: dict with information about message'''
-
 def newMessage(message):
     attach = []
     author = db.query(User).filter_by(key=message['key']).first()
-    msg = Message(text=message['message'], author=author, attachments=message['attachments'])
+    msg = Message(text=message['message'], author=author,
+                  attachments=message['attachments'])
     for ids in message['attachments']:
         attachment = db.query(File).filter_by(id=ids).first()
         attach.append({'id': attachment.id, 'type': attachment.type, 'name': attachment.name,
@@ -69,6 +69,7 @@ def newMessage(message):
     return {'event': 'message', 'id': msg.id, 'text': msg.text, 'attachments': attach, 'author': {
         'id': msg.author.id, 'name': msg.author.name}, 'timestamp': msg.timestamp.isoformat()}
 
+
 '''Function loginUser:
    Args: name - name of user
          passwd - password of user
@@ -77,17 +78,19 @@ def newMessage(message):
    Return: user object'''
 def loginUser(name, passwd):
     user = db.query(User).filter_by(name=name).first()
-    if user != None and user.check_passwd(passwd):
+    if user and user.check_passwd(passwd):
         user.set_key()
         db.commit()
         return user
+    else:
+        return None
 
 
 def registerUser(name, email, passwd):
     user = db.query(User).filter_by(name=name).first()
-    if user == None:
+    if not user:
         user = db.query(User).filter_by(email=email).first()
-        if user == None:
+        if not user:
             user = User(name=name, email=email)
             user.set_passwd(passwd)
             db.add(user)
@@ -108,10 +111,9 @@ def getMessages():
                 attach_ids = message.attachments
                 for ids in attach_ids:
                     attachment = db.query(File).filter_by(id=ids).first()
-                    attach.append({'id': attachment.id, 'name':attachment.name, 'type': attachment.type,
+                    attach.append({'id': attachment.id, 'name': attachment.name, 'type': attachment.type,
                                    'link': attachment.link, 'owner_id': attachment.owner_id})
 
-            # print(attach)
             msg.append({'id': message.id, 'text': message.text, 'attachments': attach, 'author': {
                        'id': message.author.id, 'name': message.author.name}, 'timestamp': message.timestamp.isoformat()})
             attach = []
@@ -119,7 +121,6 @@ def getMessages():
 
 
 def newFile(file, key):
-    print('newfile')
     if file['content_type'] in filetypes['image']:
         name = file['filename']
         author = db.query(User).filter_by(key=key).first()
@@ -127,20 +128,23 @@ def newFile(file, key):
         f = File(type=file['content_type'], name=name, link=url, owner=author)
         db.add(f)
         db.commit()
-        
 
     elif file['content_type'] in filetypes['file']:
-        print('NO IMAGE')
         author = db.query(User).filter_by(key=key).first()
-        upload_url = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()
+        upload_url = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path': '/Chat_Storage/{}'.format(
+            file['filename'])}, headers={"Accept": "application/json", "Authorization": Y_TOKEN}).json()
         if 'href' in upload_url.keys():
             requests.put(upload_url['href'], data=file.body)
-            requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path':'/Chat_Storage/{}'.format(file['filename'])}, headers={"Accept": "application/json", "Authorization":Y_TOKEN})
-        url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path':'/Chat_Storage/{}'.format(file['filename']), 'fields':'public_url'}, headers={"Accept": "application/json", "Authorization":Y_TOKEN}).json()
+            requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path': '/Chat_Storage/{}'.format(
+                file['filename'])}, headers={"Accept": "application/json", "Authorization": Y_TOKEN})
+        url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path': '/Chat_Storage/{}'.format(
+            file['filename']), 'fields': 'public_url'}, headers={"Accept": "application/json", "Authorization": Y_TOKEN}).json()
         print('FILE URL:'+str(url))
-        f = File(type=file['content_type'], name=file['filename'], link=url['public_url'], owner=author)
+        f = File(type=file['content_type'], name=file['filename'],
+                 link=url['public_url'], owner=author)
         db.add(f)
         db.commit()
-    
-    else: return None
+
+    else:
+        return None
     return f.id
