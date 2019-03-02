@@ -24,7 +24,7 @@ class PersonHandler(tornado.web.RequestHandler):
     def get(self):
         user_id=self.get_argument('id',None)
         if user_id:
-            user=db.query(User).filter_by(id=user_id)
+            user=db.query(User).filter_by(id=user_id).first()
             if user:
                 PersonHandler.render(self,"templates/person.html", user=user)
 
