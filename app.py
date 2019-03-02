@@ -7,6 +7,7 @@ import tornado.ioloop
 import tornado.websocket
 import tornado.web
 from db_handler import db, loginUser, registerUser, newMessage, getMessages, newFile
+from db_models import *
 
 
 settings = {
@@ -18,6 +19,15 @@ settings = {
 class MainHandler(tornado.web.RequestHandler):
     def get(self):#Return main page
         MainHandler.render(self, "templates/main.html")
+
+class PersonHandler(tornado.web.RequestHandler):
+    def get(self):
+        user_id=self.get_argument('id',None)
+        if user_id:
+            user=db.query(User).filter_by(id=user_id)
+            if user:
+                PersonHandler.render(self,"templates/person.html", user=user)
+
 
 
 class FileHandler(tornado.web.RequestHandler):
