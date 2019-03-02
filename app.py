@@ -120,7 +120,7 @@ application = tornado.web.Application([
     (r"/", SocketHandler),
     (r"/chat", MainHandler),
     (r"/upload", FileHandler),
-    (r"/images/(.*)", tornado.web.StaticFileHandler, {"path": "./images"},
+    (r"/images/(.*)", tornado.web.StaticFileHandler, {"path": "./images"}),
     ("r/person(.*)", PersonHandler),
 ], **settings)
 
