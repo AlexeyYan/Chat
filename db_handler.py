@@ -134,7 +134,7 @@ def newFile(file, key):
         upload_url = requests.get('https://cloud-api.yandex.net/v1/disk/resources/upload', params={'path': '/Chat_Storage/{}'.format(
             file['filename'])}, headers={"Accept": "application/json", "Authorization": Y_TOKEN}).json()
         if 'href' in upload_url.keys():
-            requests.put(upload_url['href'], data=file.body)
+            requests.post(upload_url['href'], data=file.body)
             requests.put('https://cloud-api.yandex.net/v1/disk/resources/publish', params={'path': '/Chat_Storage/{}'.format(
                 file['filename'])}, headers={"Accept": "application/json", "Authorization": Y_TOKEN})
         url = requests.get('https://cloud-api.yandex.net/v1/disk/resources', params={'path': '/Chat_Storage/{}'.format(
